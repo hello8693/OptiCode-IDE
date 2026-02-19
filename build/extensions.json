@@ -199,43 +199,7 @@
         "version": "1.88.1"
       },
       {
-        "name": "theme-abyss",
-        "version": "1.88.1"
-      },
-      {
         "name": "theme-defaults",
-        "version": "1.88.1"
-      },
-      {
-        "name": "theme-kimbie-dark",
-        "version": "1.88.1"
-      },
-      {
-        "name": "theme-monokai",
-        "version": "1.88.1"
-      },
-      {
-        "name": "theme-monokai-dimmed",
-        "version": "1.88.1"
-      },
-      {
-        "name": "theme-quietlight",
-        "version": "1.88.1"
-      },
-      {
-        "name": "theme-red",
-        "version": "1.88.1"
-      },
-      {
-        "name": "theme-solarized-dark",
-        "version": "1.88.1"
-      },
-      {
-        "name": "theme-solarized-light",
-        "version": "1.88.1"
-      },
-      {
-        "name": "theme-tomorrow-night-blue",
         "version": "1.88.1"
       },
       {
@@ -244,10 +208,6 @@
       },
       {
         "name": "vb",
-        "version": "1.88.1"
-      },
-      {
-        "name": "vscode-theme-seti",
         "version": "1.88.1"
       },
       {

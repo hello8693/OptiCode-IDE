@@ -1,6 +1,6 @@
-<h1 align="center">CodeFuse IDE</h1>
+<h1 align="center">OptiCode IDE</h1>
 
-<p align="center">AI Native IDE based on CodeFuse and OpenSumi.</p>
+<p align="center">AI Native IDE.</p>
 
 ![0F2230D7-7623-4141-91BE-487973ED0AF7](https://github.com/user-attachments/assets/8b6c71c2-7242-4894-9c73-996365b4245a)
 
@@ -8,12 +8,12 @@
 [![Discussions][discussions-image]][discussions-url] [![Open in CodeBlitz][codeblitz-image]][codeblitz-url]
 
 [discussions-image]: https://img.shields.io/badge/discussions-on%20github-blue
-[discussions-url]: https://github.com/codefuse-ai/codefuse-ide/discussions
+[discussions-url]: https://github.com/opticode-ai/opticode-ide/discussions
 [codeblitz-image]: https://img.shields.io/badge/Ant_Codespaces-Open_in_CodeBlitz-1677ff
-[codeblitz-url]: https://codeblitz.cloud.alipay.com/github/codefuse-ai/codefuse-ide
-[github-issues-url]: https://github.com/opensumi/core/issues
-[help-wanted-image]: https://flat.badgen.net/github/label-issues/codefuse-ai/codefuse-ide/🤔%20help%20wanted/open
-[help-wanted-url]: https://github.com/codefuse-ai/codefuse-ide/issues?q=is%3Aopen+is%3Aissue+label%3A%22🤔+help+wanted%22
+[codeblitz-url]: https://codeblitz.cloud.alipay.com/github/opticode-ai/opticode-ide
+[github-issues-url]: https://github.com/opticode-ai/opticode-ide/issues
+[help-wanted-image]: https://flat.badgen.net/github/label-issues/opticode-ai/opticode-ide/🤔%20help%20wanted/open
+[help-wanted-url]: https://github.com/opticode-ai/opticode-ide/issues?q=is%3Aopen+is%3Aissue+label%3A%22🤔+help+wanted%22
 
 ## ✨ Features
 - **AI-Native Development Environment**: Enjoy an integrated development environment that leverages AI technologies to enhance productivity and streamline workflows.
@@ -23,7 +23,7 @@
 
 ## Getting started
 
-See https://github.com/codefuse-ai/codefuse-ide/releases
+See https://github.com/opticode-ai/opticode-ide/releases
 
 ## Contributing
 
@@ -57,5 +57,4 @@ yarn run start-web
 
 ## Links
 
-- **CodeFuse**: https://codefuse.ai
-- **OpenSumi**: https://opensumi.com
+- **OptiCode IDE**: https://opticode.ai

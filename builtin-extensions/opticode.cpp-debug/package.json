@@ -1,0 +1,114 @@
+{
+  "name": "opticode.cpp-debug",
+  "displayName": "OptiCode C/C++ Debugger",
+  "version": "0.0.1",
+  "publisher": "opticode",
+  "description": "C/C++ debugger for OptiCode using lldb-dap on macOS and gdb DAP on other platforms.",
+  "license": "MIT",
+  "packageManager": "yarn@4.3.1",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": ["Debuggers"],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "clean": "rm -rf dist",
+    "typecheck": "tsc --noEmit",
+    "dev:install": "node scripts/dev-install.mjs",
+    "postbuild": "node scripts/dev-install.mjs"
+  },
+  "activationEvents": [
+    "onDebugResolve:cppdbg",
+    "onDebugInitialConfigurations",
+    "onDebugDynamicConfigurations"
+  ],
+  "contributes": {
+    "breakpoints": [
+      { "language": "c" },
+      { "language": "cpp" },
+      { "language": "objective-c" },
+      { "language": "objective-cpp" }
+    ],
+    "debuggers": [
+      {
+        "type": "cppdbg",
+        "label": "C/C++ (OptiCode)",
+        "languages": ["c", "cpp", "objective-c", "objective-cpp"],
+        "configurationAttributes": {
+          "launch": {
+            "required": ["program"],
+            "properties": {
+              "type": {
+                "enum": ["cppdbg"],
+                "description": "Debug type"
+              },
+              "name": {
+                "type": "string",
+                "description": "Configuration name",
+                "default": "Debug"
+              },
+              "request": {
+                "enum": ["launch"],
+                "description": "Launch request",
+                "default": "launch"
+              },
+              "program": {
+                "type": "string",
+                "description": "Executable path",
+                "default": "${fileDirname}/${fileBasenameNoExtension}"
+              },
+              "args": {
+                "type": "array",
+                "items": { "type": "string" },
+                "default": []
+              },
+              "cwd": {
+                "type": "string",
+                "description": "Working directory",
+                "default": "${workspaceFolder}"
+              },
+              "stopOnEntry": {
+                "type": "boolean",
+                "default": false
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": { "type": "string" },
+                "default": {}
+              },
+              "console": {
+                "type": "string",
+                "enum": ["internalConsole", "integratedTerminal", "externalTerminal"],
+                "default": "integratedTerminal"
+              }
+            }
+          }
+        },
+        "configurationSnippets": [
+          {
+            "label": "C/C++: 调试当前程序",
+            "description": "启动调试",
+            "body": {
+              "name": "Debug",
+              "type": "cppdbg",
+              "request": "launch",
+              "program": "${fileDirname}/${fileBasenameNoExtension}",
+              "args": [],
+              "cwd": "${workspaceFolder}",
+              "stopOnEntry": false,
+              "console": "integratedTerminal"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.80.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.0"
+  }
+}

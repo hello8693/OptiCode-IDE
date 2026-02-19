@@ -1,0 +1,71 @@
+.cpp-template {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 16px;
+  gap: 12px;
+  color: var(--kt-foreground, var(--foreground));
+}
+
+.cpp-template__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cpp-template__title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.cpp-template__desc {
+  font-size: 12px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.cpp-template__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cpp-template__btn {
+  border: 1px solid transparent;
+  background: var(--kt-button-secondaryBackground, #3a3d41);
+  color: var(--kt-button-secondaryForeground, #fff);
+  padding: 0 10px;
+  height: 24px;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.cpp-template__btn:hover {
+  background: var(--kt-button-secondaryHoverBackground, #45494e);
+}
+
+.cpp-template__btn--primary {
+  background: var(--kt-button-background, #0e639c);
+  border-color: var(--kt-button-background, #0e639c);
+  color: var(--kt-button-foreground, #fff);
+}
+
+.cpp-template__editor {
+  flex: 1;
+  width: 100%;
+  min-height: 320px;
+  background: var(--kt-input-background, var(--editor-background, #1e1e1e));
+  color: var(--kt-input-foreground, var(--foreground, #e5e7eb));
+  border: 1px solid var(--kt-input-border, #3f3f46);
+  border-radius: 0;
+  padding: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  resize: none;
+}
+
+.cpp-template__saved {
+  font-size: 11px;
+  opacity: 0.6;
+}

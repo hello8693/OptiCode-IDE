@@ -191,7 +191,7 @@ export default createConfig((_env, argv) => {
       setupExitSignals: true,
       static: outDir,
       headers: {
-        'Content-Security-Policy': "default-src 'self' 'unsafe-inline' data: file:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data: file:; connect-src 'self' file:; worker-src 'self' data: blob:; img-src 'self' data: file:",
+        'Content-Security-Policy': "default-src 'self' 'unsafe-inline' data: file: https: blob:; script-src 'self' 'unsafe-eval' 'unsafe-inline' data: file: https: blob:; connect-src 'self' file: https: wss:; worker-src 'self' data: blob:; img-src 'self' data: file: https: blob:; style-src 'self' 'unsafe-inline' data: file: https: blob:; font-src 'self' data: file: https: blob:;",
       },
     }
   }

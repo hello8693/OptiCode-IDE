@@ -5,9 +5,9 @@ import '@opensumi/ide-core-browser/lib/style/icon.less';
 import './index.less'
 
 import { DEFAULT_LAYOUT_VIEW_SIZE } from '@opensumi/ide-core-browser/lib/layout/constants';
-import { AINativeSettingSectionsId } from '@opensumi/ide-core-common'
 import { IElectronMainLifeCycleService } from '@opensumi/ide-core-common/lib/electron';
 import { IClientAppOpts, electronEnv, URI, ClientCommonModule, BrowserModule, ConstructorOf, LayoutConfig, SlotLocation } from '@opensumi/ide-core-browser';
+import { ToolbarActionBasedLayout } from '@opensumi/ide-core-browser/lib/components';
 import { ClientApp } from '@opensumi/ide-core-browser/lib/bootstrap/app';
 import { MainLayoutModule } from '@opensumi/ide-main-layout/lib/browser';
 import { MenuBarModule } from '@opensumi/ide-menu-bar/lib/browser';
@@ -50,14 +50,8 @@ import { TaskModule } from '@opensumi/ide-task/lib/browser';
 import { OpenVsxExtensionManagerModule } from '@opensumi/ide-extension-manager/lib/browser';
 import { DesignModule } from '@opensumi/ide-design/lib/browser';
 import { DESIGN_MENUBAR_CONTAINER_VIEW_ID } from '@opensumi/ide-design/lib/common/constants';
-import { AILayout } from '@opensumi/ide-ai-native/lib/browser/layout/ai-layout';
-import { AINativeModule } from "@opensumi/ide-ai-native/lib/browser";
-import { DESIGN_MENU_BAR_LEFT } from '@opensumi/ide-design';
 import { CoreBrowserModule, ELECTRON_HEADER } from '@/core/browser';
-import { AIFeatureModule, AI_MENU_BAR_LEFT_ACTION } from '@/ai/browser';
 import { AutoUpdaterModule } from '@/auto-updater/browser'
-import logo from '@/core/browser/assets/logo.svg'
-import { DefaultSystemPrompt } from '@/ai/browser/prompt';
 
 // 临时修复 bash 打开 -l 参数不支持导致报错的问题
 terminalPreferenceSchema.properties['terminal.integrated.shellArgs.osx'].default = [];
@@ -103,10 +97,7 @@ const modules: ConstructorOf<BrowserModule>[] = [
   CommentsModule,
   TaskModule,
   CoreBrowserModule,
-  // ai
   DesignModule,
-  AINativeModule,
-  AIFeatureModule,
   AutoUpdaterModule,
 ];
 
@@ -117,8 +108,9 @@ const layoutConfig: LayoutConfig = {
   [SlotLocation.left]: {
     modules: [
       '@opensumi/ide-explorer',
-      '@opensumi/ide-search',
-      '@opensumi/ide-scm',
+      'problem-list-container',
+      'sample-test-container',
+      'compile-run-container',
       '@opensumi/ide-extension-manager',
       '@opensumi/ide-debug',
     ],
@@ -146,9 +138,6 @@ const layoutConfig: LayoutConfig = {
   },
   [SlotLocation.extra]: {
     modules: ['breadcrumb-menu'],
-  },
-  [DESIGN_MENU_BAR_LEFT]: {
-    modules: [AI_MENU_BAR_LEFT_ACTION]
   }
 };
 
@@ -157,10 +146,10 @@ renderApp();
 
 async function renderApp() {
   const opts: IClientAppOpts = {
-    appName: 'CodeFuse IDE',
+    appName: 'OptiCode IDE',
     modules,
     layoutConfig,
-    layoutComponent: AILayout,
+    layoutComponent: ToolbarActionBasedLayout,
     layoutViewSize: {
       bigSurTitleBarHeight: DEFAULT_LAYOUT_VIEW_SIZE.menubarHeight,
     },
@@ -172,26 +161,12 @@ async function renderApp() {
     extWorkerHost: electronEnv.metadata.workerHostEntry ? URI.file(electronEnv.metadata.workerHostEntry).toString() : undefined,
     defaultPreferences: {
       'settings.userBeforeWorkspace': true,
-      'general.icon': 'vs-seti',
-      [AINativeSettingSectionsId.IntelligentCompletionsPromptEngineeringEnabled]: false,
-      // 总是显示智能提示
-      [AINativeSettingSectionsId.IntelligentCompletionsAlwaysVisible]: true,
-      // 开启 Code Edits
-      [AINativeSettingSectionsId.CodeEditsLintErrors]: true,
-      [AINativeSettingSectionsId.CodeEditsLineChange]: true,
-      [AINativeSettingSectionsId.SystemPrompt]: DefaultSystemPrompt,
+      'general.theme': 'opensumi-dark',
+      'general.icon': 'vscode-icons',
+      'menubar.compactMode': false,
     },
     onigWasmUri: URI.file(electronEnv.onigWasmPath).toString(true),
     treeSitterWasmDirectoryUri: URI.file(electronEnv.treeSitterWasmDirectoryPath).toString(true),
-    AINativeConfig: {
-      layout: {
-        menubarLogo: logo,
-      },
-      capabilities: {
-        supportsMCP: true,
-        supportsCustomLLMSettings: true,
-      }
-    },
   }
 
   const app = new ClientApp(opts);

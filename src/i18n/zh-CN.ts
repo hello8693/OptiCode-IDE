@@ -37,6 +37,6 @@ export const localizationBundle = {
     'ai.model.go': '前往',
 
     'autoUpdater.checkForUpdates': '检查更新',
-    'codefuse-ide.openLogDir': '打开日志文件夹',
+    'opticode-ide.openLogDir': '打开日志文件夹',
   },
 };

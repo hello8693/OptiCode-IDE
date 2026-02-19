@@ -1,0 +1,133 @@
+.cpp-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 16px 18px 24px;
+  color: var(--kt-foreground, var(--foreground));
+  background: var(--kt-editor-background, var(--editor-background));
+}
+
+.cpp-settings__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cpp-settings__title {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.cpp-settings__subtitle {
+  font-size: 12px;
+  opacity: 0.65;
+  margin-top: 2px;
+}
+
+.cpp-settings__badge {
+  border: 1px solid var(--kt-badge-background, #4d4d4d);
+  background: var(--kt-badge-background, #4d4d4d);
+  color: var(--kt-badge-foreground, #fff);
+  padding: 2px 8px;
+  border-radius: 0;
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+.cpp-settings__section {
+  border: 1px solid var(--kt-panel-border, #2b2b2b);
+  border-radius: 0;
+  padding: 12px 14px;
+  background: var(--kt-editorWidget-background, var(--panel-background));
+}
+
+.cpp-settings__section-title {
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.cpp-settings__pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cpp-settings__pill {
+  border: 1px solid var(--kt-input-border, #3c3c3c);
+  background: var(--kt-button-secondaryBackground, #3a3d41);
+  color: var(--kt-button-secondaryForeground, #fff);
+  border-radius: 0;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cpp-settings__pill.is-active {
+  background: var(--kt-button-background, #0e639c);
+  border-color: var(--kt-button-background, #0e639c);
+  color: var(--kt-button-foreground, #fff);
+}
+
+.cpp-settings__pill:hover {
+  background: var(--kt-button-secondaryHoverBackground, #45494e);
+}
+
+.cpp-settings__flags {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px;
+}
+
+.cpp-settings__flag {
+  display: grid;
+  grid-template-columns: 18px 1fr;
+  column-gap: 8px;
+  align-items: start;
+  font-size: 12px;
+}
+
+.cpp-settings__flag-label {
+  font-weight: 600;
+}
+
+.cpp-settings__flag-desc {
+  grid-column: 2 / 3;
+  opacity: 0.65;
+  font-size: 11px;
+}
+
+.cpp-settings__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cpp-template-settings-btn {
+  border: 1px solid transparent;
+  background: var(--kt-button-secondaryBackground, #3a3d41);
+  color: var(--kt-button-secondaryForeground, #fff);
+  padding: 0 10px;
+  height: 24px;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.cpp-template-settings-btn:hover {
+  background: var(--kt-button-secondaryHoverBackground, #45494e);
+}
+
+.cpp-settings__input {
+  background: var(--kt-input-background, var(--editor-background));
+  border: 1px solid var(--kt-input-border, #3c3c3c);
+  border-radius: 0;
+  padding: 8px 10px;
+  color: var(--kt-input-foreground, var(--foreground));
+  font-size: 12px;
+}
+
+.cpp-settings__input:focus {
+  outline: 1px solid var(--kt-focusBorder, #007fd4);
+  border-color: var(--kt-focusBorder, #007fd4);
+}

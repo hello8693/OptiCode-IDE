@@ -1,0 +1,166 @@
+{
+  "name": "opticode.cpp-language-features",
+  "displayName": "OptiCode C/C++ (clangd)",
+  "description": "OptiCode 的 C/C++ 语言支持（clangd）：补全、诊断、跳转、格式化等。",
+  "version": "1.0.0",
+  "publisher": "opticode",
+  "license": "MIT",
+  "packageManager": "yarn@4.3.1",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:c",
+    "onLanguage:cpp",
+    "onLanguage:cuda-cpp",
+    "onLanguage:objective-c",
+    "onLanguage:objective-cpp"
+  ],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "build": "node esbuild.mjs",
+    "watch": "node esbuild.mjs --watch",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "dev:install": "node scripts/dev-install.mjs",
+    "postbuild": "node scripts/dev-install.mjs"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver-protocol": "^3.17.5"
+  },
+  "devDependencies": {
+    "@types/node": "^18.0.0",
+    "@types/vscode": "^1.74.0",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.5.0"
+  },
+  "capabilities": {
+    "virtualWorkspaces": false,
+    "untrustedWorkspaces": {
+      "supported": false
+    }
+  },
+  "contributes": {
+    "configuration": {
+      "title": "clangd 配置",
+      "properties": {
+        "clangd.path": {
+          "type": "string",
+          "default": "clangd",
+          "markdownDescription": "clangd 可执行文件路径。留空则使用 `clangd`（需在 PATH 中）。"
+        },
+        "clangd.arguments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "传递给 clangd 的额外命令行参数。"
+        },
+        "clangd.fallbackFlags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [
+            "-std=c++20",
+            "-Wall"
+          ],
+          "markdownDescription": "当没有 `compile_commands.json` 时使用的编译参数。"
+        },
+        "clangd.enableCodeCompletion": {
+          "type": "boolean",
+          "default": true,
+          "description": "启用 clangd 的代码补全。"
+        },
+        "clangd.enableInlayHints": {
+          "type": "boolean",
+          "default": true,
+          "description": "启用内联提示（参数名、类型等）。"
+        },
+        "clangd.serverCompletionRanking": {
+          "type": "boolean",
+          "default": true,
+          "description": "使用 clangd 的补全排序（推荐开启）。"
+        },
+        "clangd.detectExtensionConflicts": {
+          "type": "boolean",
+          "default": true,
+          "description": "检测与 ms-vscode.cpptools 的冲突。"
+        },
+        "clangd.restartAfterCrash": {
+          "type": "boolean",
+          "default": true,
+          "description": "clangd 崩溃后自动重启。"
+        },
+        "clangd.checkUpdates": {
+          "type": "boolean",
+          "default": false,
+          "description": "启动时检查 clangd 更新。"
+        },
+        "clangd.onConfigChanged": {
+          "type": "string",
+          "default": "prompt",
+          "enum": [
+            "prompt",
+            "restart",
+            "ignore"
+          ],
+          "description": "当 .clangd 或 compile_commands.json 变化时的行为。"
+        },
+        "clangd.trace": {
+          "type": "string",
+          "default": "",
+          "description": "设置 clangd 追踪日志文件路径（调试用）。"
+        },
+        "clangd.logLevel": {
+          "type": "string",
+          "enum": ["error", "warning", "info", "verbose"],
+          "default": "error",
+          "description": "clangd 日志等级，减小输出可设为 error。"
+        },
+        "clangd.autoGenerateCompileCommands": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "当工作区缺少 `compile_commands.json` 时，自动为 C/C++ 文件生成编译数据库（默认关闭，单文件场景建议使用 fallbackFlags）。"
+        },
+        "clangd.autoGenerateCompileCommands.std": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "自动生成 compile_commands.json 时使用的 C++ 标准。留空则跟随 `oi.cpp.std` 设置。"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "clangd.restart",
+        "title": "重启 clangd 语言服务器",
+        "category": "clangd"
+      },
+      {
+        "command": "clangd.switchheadersource",
+        "title": "切换头文件/源文件",
+        "category": "clangd"
+      },
+      {
+        "command": "clangd.install",
+        "title": "下载/安装 clangd",
+        "category": "clangd"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "cpp",
+        "path": "./snippets/oi.json"
+      },
+      {
+        "language": "c",
+        "path": "./snippets/oi.json"
+      }
+    ]
+  }
+}

@@ -60,6 +60,7 @@ const config: ForgeConfig = {
     ],
     extraResource: [
       path.join(__dirname, './assets/app-update.yml'), // for electron-updater
+      path.join(__dirname, './tools'), // bundled toolchains (e.g. mingw-w64)
     ],
     ...(process.env.WINDOWS_SIGN_TOOL_PATH ? ({
       windowsSign: {

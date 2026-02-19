@@ -10,9 +10,18 @@ import { ProjectSwitcherContribution } from './project.contribution';
 import { LocalMenuContribution } from './menu.contribution';
 import { LocalThemeContribution } from './theme.contribution';
 import { patchProviders } from './patch'
-import { IStorageService, IAppMenuService, IThemeService } from '../common';
+import { IStorageService, IAppMenuService, IThemeService, ISampleDataService, IProblemService, IJudgeService, IProblemAssetService } from '../common';
 import { HeaderContribution, ELECTRON_HEADER } from './header/header.contribution'
 import { WelcomeContribution } from './welcome/welcome.contribution'
+import { CppStatusContribution } from './cpp/status.contribution'
+import { CompileRunContribution } from './compile-run/contribution'
+import { ProblemListContribution } from './problem-list/contribution'
+import { SampleDataService } from './sample-data.service'
+import { ProblemService } from './services/problem.service'
+import { ProblemAssetService } from './services/problem-asset.service'
+import { CppPreferenceContribution } from './cpp/preference.contribution'
+import { JudgeService } from './services/judge.service'
+import { ClangdConfigService } from './services/clangd-config.service'
 
 export { ELECTRON_HEADER }
 
@@ -34,6 +43,27 @@ export class CoreBrowserModule extends BrowserModule {
     ProjectSwitcherContribution,
     LocalMenuContribution,
     LocalThemeContribution,
+    CppPreferenceContribution,
+    CppStatusContribution,
+    CompileRunContribution,
+    ProblemListContribution,
+    ClangdConfigService,
+    {
+      token: IJudgeService,
+      useClass: JudgeService,
+    },
+    {
+      token: ISampleDataService,
+      useClass: SampleDataService,
+    },
+    {
+      token: IProblemService,
+      useClass: ProblemService,
+    },
+    {
+      token: IProblemAssetService,
+      useClass: ProblemAssetService,
+    },
     {
       token: IStorageService,
       useValue: createElectronMainApi(IStorageService),

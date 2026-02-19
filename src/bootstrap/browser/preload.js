@@ -32,7 +32,14 @@ electronEnv.currentWindowId = window.id;
 electronEnv.currentWebContentsId = webContentsId;
 electronEnv.monacoWorkerPath = path.join(__dirname, 'editor.worker.bundle.js');
 
-const metaData = JSON.parse(ipcRenderer.sendSync('window-metadata', electronEnv.currentWindowId));
+const metadataRaw = ipcRenderer.sendSync('window-metadata', electronEnv.currentWindowId);
+let metaData = {};
+try {
+  metaData = metadataRaw ? JSON.parse(metadataRaw) : {};
+} catch (error) {
+  console.error('Failed to parse window metadata', error);
+  metaData = {};
+}
 electronEnv.metadata = metaData;
 process.env = Object.assign({}, process.env, metaData.env, { WORKSPACE_DIR: metaData.workspace });
 

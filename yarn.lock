@@ -218,6 +218,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:^7.16.5":
+  version: 7.28.6
+  resolution: "@babel/runtime@npm:7.28.6"
+  checksum: 10/fbcd439cb74d4a681958eb064c509829e3f46d8a4bfaaf441baa81bb6733d1e680bccc676c813883d7741bcaada1d0d04b15aa320ef280b5734e2192b50decf9
+  languageName: node
+  linkType: hard
+
 "@conventional-changelog/git-client@npm:^1.0.0":
   version: 1.0.1
   resolution: "@conventional-changelog/git-client@npm:1.0.1"
@@ -734,6 +741,181 @@ __metadata:
   bin:
     electron-windows-sign: bin/electron-windows-sign.js
   checksum: 10/6ba658d7d15d319dd681bc686da427c77a97253eec9e65f9651713d3afa789273580bc20df9b8836d665bcb7ecddef2093e0bb8a731087a787a88c150290fe30
+  languageName: node
+  linkType: hard
+
+"@esbuild/aix-ppc64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/aix-ppc64@npm:0.24.2"
+  conditions: os=aix & cpu=ppc64
+  languageName: node
+  linkType: hard
+
+"@esbuild/android-arm64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/android-arm64@npm:0.24.2"
+  conditions: os=android & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/android-arm@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/android-arm@npm:0.24.2"
+  conditions: os=android & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@esbuild/android-x64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/android-x64@npm:0.24.2"
+  conditions: os=android & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/darwin-arm64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/darwin-arm64@npm:0.24.2"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/darwin-x64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/darwin-x64@npm:0.24.2"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/freebsd-arm64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/freebsd-arm64@npm:0.24.2"
+  conditions: os=freebsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/freebsd-x64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/freebsd-x64@npm:0.24.2"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-arm64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-arm64@npm:0.24.2"
+  conditions: os=linux & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-arm@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-arm@npm:0.24.2"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-ia32@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-ia32@npm:0.24.2"
+  conditions: os=linux & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-loong64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-loong64@npm:0.24.2"
+  conditions: os=linux & cpu=loong64
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-mips64el@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-mips64el@npm:0.24.2"
+  conditions: os=linux & cpu=mips64el
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-ppc64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-ppc64@npm:0.24.2"
+  conditions: os=linux & cpu=ppc64
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-riscv64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-riscv64@npm:0.24.2"
+  conditions: os=linux & cpu=riscv64
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-s390x@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-s390x@npm:0.24.2"
+  conditions: os=linux & cpu=s390x
+  languageName: node
+  linkType: hard
+
+"@esbuild/linux-x64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/linux-x64@npm:0.24.2"
+  conditions: os=linux & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/netbsd-arm64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/netbsd-arm64@npm:0.24.2"
+  conditions: os=netbsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/netbsd-x64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/netbsd-x64@npm:0.24.2"
+  conditions: os=netbsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/openbsd-arm64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/openbsd-arm64@npm:0.24.2"
+  conditions: os=openbsd & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/openbsd-x64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/openbsd-x64@npm:0.24.2"
+  conditions: os=openbsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/sunos-x64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/sunos-x64@npm:0.24.2"
+  conditions: os=sunos & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@esbuild/win32-arm64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/win32-arm64@npm:0.24.2"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@esbuild/win32-ia32@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/win32-ia32@npm:0.24.2"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@esbuild/win32-x64@npm:0.24.2":
+  version: 0.24.2
+  resolution: "@esbuild/win32-x64@npm:0.24.2"
+  conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
@@ -2463,6 +2645,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/vscode@npm:^1.80.0":
+  version: 1.109.0
+  resolution: "@types/vscode@npm:1.109.0"
+  checksum: 10/bf5402ed90b80b4de4817721e50c797dfc07a633677e20ac48b0038b5741918e9b188d7ee248728b73614f5a18070e3ab8b84132a20a8493638cb10b11ad1708
+  languageName: node
+  linkType: hard
+
 "@types/ws@npm:^8.5.10, @types/ws@npm:^8.5.5":
   version: 8.5.13
   resolution: "@types/ws@npm:8.5.13"
@@ -4162,139 +4351,6 @@ __metadata:
   checksum: 10/a5d9f37091c70398a269e625cedff5622f200ed0aa0cff22ee7b55ed74a123834b58711776eb0f1dc58eb6ebbc1185aa7567b57bd5979a948c6e4f85073e2c05
   languageName: node
   linkType: hard
-
-"codefuse-ide@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "codefuse-ide@workspace:."
-  dependencies:
-    "@electron-forge/cli": "npm:^7.5.0"
-    "@electron-forge/maker-squirrel": "npm:^7.5.0"
-    "@electron-forge/maker-zip": "npm:^7.4.0"
-    "@electron-forge/plugin-base": "npm:^7.4.0"
-    "@electron-forge/plugin-webpack": "npm:^7.4.0"
-    "@electron-forge/shared-types": "npm:^7.4.0"
-    "@electron-forge/web-multi-logger": "npm:^7.5.0"
-    "@opensumi/ide-addons": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-ai-native": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-comments": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-core-browser": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-core-common": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-core-electron-main": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-core-node": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-debug": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-decoration": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-design": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-editor": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-electron-basic": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-explorer": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-express-file-server": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-extension": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-extension-manager": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-extension-storage": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-file-scheme": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-file-search": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-file-service": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-file-tree-next": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-i18n": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-keymaps": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-logs": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-main-layout": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-markdown": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-markers": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-menu-bar": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-monaco": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-monaco-enhance": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-opened-editor": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-outline": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-output": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-overlay": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-preferences": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-process": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-quick-open": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-remote-opener": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-scm": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-search": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-status-bar": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-storage": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-task": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-terminal-next": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-testing": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-theme": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-toolbar": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-variable": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-webview": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-workspace": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-workspace-edit": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/tree-sitter-wasm": "npm:1.1.2"
-    "@types/debug": "npm:^4"
-    "@types/js-yaml": "npm:^4"
-    "@types/koa": "npm:^2"
-    "@types/node": "npm:^22.8.1"
-    "@types/react": "npm:^18.3.3"
-    "@types/react-dom": "npm:^18.3.1"
-    "@vscode/spdlog": "npm:^0.15.0"
-    app-builder-bin: "npm:^4.2.0"
-    app-builder-lib: "npm:25.1.8"
-    asar: "npm:^3.2.0"
-    buffer: "npm:^6.0.3"
-    chalk: "npm:^4.0.0"
-    conventional-changelog-cli: "npm:^5.0.0"
-    copy-webpack-plugin: "npm:^12.0.2"
-    cross-env: "npm:^7.0.3"
-    css-loader: "npm:^6"
-    debug: "npm:^4.3.7"
-    electron: "npm:30.1.2"
-    electron-updater: "npm:6.3.9"
-    extract-zip: "npm:^2.0.1"
-    fast-glob: "npm:^3.3.2"
-    glob: "npm:^11.0.0"
-    html-webpack-plugin: "npm:^5.6.2"
-    js-yaml: "npm:^4.1.0"
-    koa: "npm:^2.15.3"
-    koa-static: "npm:^5.0.0"
-    less: "npm:^4.2.0"
-    less-loader: "npm:^12.2.0"
-    listr2: "npm:^8.2.5"
-    mini-css-extract-plugin: "npm:^2.9.0"
-    mri: "npm:^1.2.0"
-    node-gyp: "npm:^10.2.0"
-    node-polyfill-webpack-plugin: "npm:^4.0.0"
-    npm-run-all: "npm:^4.1.5"
-    null-loader: "npm:^4.0.1"
-    optimize-css-assets-webpack-plugin: "npm:^6.0.1"
-    process: "npm:^0.11.10"
-    react: "npm:^18.3.1"
-    react-dom: "npm:^18.3.1"
-    standard-version: "npm:^9.5.0"
-    style-loader: "npm:^4.0.0"
-    style-resources-loader: "npm:^1.5.0"
-    ts-loader: "npm:^9.5.1"
-    ts-node: "npm:^10.9.2"
-    tsconfig-paths: "npm:^4.2.0"
-    tsconfig-paths-webpack-plugin: "npm:^4.1.0"
-    typescript: "npm:^5.5.3"
-    undici-types: "npm:^6.20.0"
-    webpack: "npm:^5.94.0"
-    webpack-cli: "npm:^5.1.4"
-    webpack-dev-server: "npm:^5.2.0"
-    webpack-merge: "npm:^6.0.1"
-    webpack-node-externals: "npm:^3.0.0"
-    yauzl: "npm:^3.1.3"
-  dependenciesMeta:
-    "@parcel/watcher":
-      built: false
-    "@vscode/spdlog":
-      built: false
-    keytar:
-      built: false
-    node-pty:
-      built: false
-    nsfw:
-      built: false
-    spdlog:
-      built: false
-  languageName: unknown
-  linkType: soft
 
 "color-convert@npm:^1.9.0":
   version: 1.9.3
@@ -6174,6 +6230,92 @@ __metadata:
   version: 4.1.1
   resolution: "es6-error@npm:4.1.1"
   checksum: 10/48483c25701dc5a6376f39bbe2eaf5da0b505607ec5a98cd3ade472c1939242156660636e2e508b33211e48e88b132d245341595c067bd4a95ac79fa7134da06
+  languageName: node
+  linkType: hard
+
+"esbuild@npm:^0.24.0":
+  version: 0.24.2
+  resolution: "esbuild@npm:0.24.2"
+  dependencies:
+    "@esbuild/aix-ppc64": "npm:0.24.2"
+    "@esbuild/android-arm": "npm:0.24.2"
+    "@esbuild/android-arm64": "npm:0.24.2"
+    "@esbuild/android-x64": "npm:0.24.2"
+    "@esbuild/darwin-arm64": "npm:0.24.2"
+    "@esbuild/darwin-x64": "npm:0.24.2"
+    "@esbuild/freebsd-arm64": "npm:0.24.2"
+    "@esbuild/freebsd-x64": "npm:0.24.2"
+    "@esbuild/linux-arm": "npm:0.24.2"
+    "@esbuild/linux-arm64": "npm:0.24.2"
+    "@esbuild/linux-ia32": "npm:0.24.2"
+    "@esbuild/linux-loong64": "npm:0.24.2"
+    "@esbuild/linux-mips64el": "npm:0.24.2"
+    "@esbuild/linux-ppc64": "npm:0.24.2"
+    "@esbuild/linux-riscv64": "npm:0.24.2"
+    "@esbuild/linux-s390x": "npm:0.24.2"
+    "@esbuild/linux-x64": "npm:0.24.2"
+    "@esbuild/netbsd-arm64": "npm:0.24.2"
+    "@esbuild/netbsd-x64": "npm:0.24.2"
+    "@esbuild/openbsd-arm64": "npm:0.24.2"
+    "@esbuild/openbsd-x64": "npm:0.24.2"
+    "@esbuild/sunos-x64": "npm:0.24.2"
+    "@esbuild/win32-arm64": "npm:0.24.2"
+    "@esbuild/win32-ia32": "npm:0.24.2"
+    "@esbuild/win32-x64": "npm:0.24.2"
+  dependenciesMeta:
+    "@esbuild/aix-ppc64":
+      optional: true
+    "@esbuild/android-arm":
+      optional: true
+    "@esbuild/android-arm64":
+      optional: true
+    "@esbuild/android-x64":
+      optional: true
+    "@esbuild/darwin-arm64":
+      optional: true
+    "@esbuild/darwin-x64":
+      optional: true
+    "@esbuild/freebsd-arm64":
+      optional: true
+    "@esbuild/freebsd-x64":
+      optional: true
+    "@esbuild/linux-arm":
+      optional: true
+    "@esbuild/linux-arm64":
+      optional: true
+    "@esbuild/linux-ia32":
+      optional: true
+    "@esbuild/linux-loong64":
+      optional: true
+    "@esbuild/linux-mips64el":
+      optional: true
+    "@esbuild/linux-ppc64":
+      optional: true
+    "@esbuild/linux-riscv64":
+      optional: true
+    "@esbuild/linux-s390x":
+      optional: true
+    "@esbuild/linux-x64":
+      optional: true
+    "@esbuild/netbsd-arm64":
+      optional: true
+    "@esbuild/netbsd-x64":
+      optional: true
+    "@esbuild/openbsd-arm64":
+      optional: true
+    "@esbuild/openbsd-x64":
+      optional: true
+    "@esbuild/sunos-x64":
+      optional: true
+    "@esbuild/win32-arm64":
+      optional: true
+    "@esbuild/win32-ia32":
+      optional: true
+    "@esbuild/win32-x64":
+      optional: true
+  bin:
+    esbuild: bin/esbuild
+  checksum: 10/95425071c9f24ff88bf61e0710b636ec0eb24ddf8bd1f7e1edef3044e1221104bbfa7bbb31c18018c8c36fa7902c5c0b843f829b981ebc89160cf5eebdaa58f4
   languageName: node
   linkType: hard
 
@@ -10591,6 +10733,142 @@ __metadata:
   languageName: node
   linkType: hard
 
+"opticode-ide@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "opticode-ide@workspace:."
+  dependencies:
+    "@electron-forge/cli": "npm:^7.5.0"
+    "@electron-forge/maker-squirrel": "npm:^7.5.0"
+    "@electron-forge/maker-zip": "npm:^7.4.0"
+    "@electron-forge/plugin-base": "npm:^7.4.0"
+    "@electron-forge/plugin-webpack": "npm:^7.4.0"
+    "@electron-forge/shared-types": "npm:^7.4.0"
+    "@electron-forge/web-multi-logger": "npm:^7.5.0"
+    "@opensumi/ide-addons": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-ai-native": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-comments": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-core-browser": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-core-common": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-core-electron-main": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-core-node": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-debug": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-decoration": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-design": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-editor": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-electron-basic": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-explorer": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-express-file-server": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-extension": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-extension-manager": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-extension-storage": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-file-scheme": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-file-search": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-file-service": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-file-tree-next": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-i18n": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-keymaps": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-logs": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-main-layout": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-markdown": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-markers": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-menu-bar": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-monaco": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-monaco-enhance": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-opened-editor": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-outline": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-output": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-overlay": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-preferences": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-process": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-quick-open": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-remote-opener": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-scm": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-search": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-status-bar": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-storage": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-task": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-terminal-next": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-testing": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-theme": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-toolbar": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-variable": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-webview": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-workspace": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-workspace-edit": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/tree-sitter-wasm": "npm:1.1.2"
+    "@types/debug": "npm:^4"
+    "@types/js-yaml": "npm:^4"
+    "@types/koa": "npm:^2"
+    "@types/node": "npm:^22.8.1"
+    "@types/react": "npm:^18.3.3"
+    "@types/react-dom": "npm:^18.3.1"
+    "@types/vscode": "npm:^1.80.0"
+    "@vscode/spdlog": "npm:^0.15.0"
+    app-builder-bin: "npm:^4.2.0"
+    app-builder-lib: "npm:25.1.8"
+    asar: "npm:^3.2.0"
+    buffer: "npm:^6.0.3"
+    chalk: "npm:^4.0.0"
+    conventional-changelog-cli: "npm:^5.0.0"
+    copy-webpack-plugin: "npm:^12.0.2"
+    cross-env: "npm:^7.0.3"
+    css-loader: "npm:^6"
+    debug: "npm:^4.3.7"
+    electron: "npm:30.1.2"
+    electron-updater: "npm:6.3.9"
+    esbuild: "npm:^0.24.0"
+    extract-zip: "npm:^2.0.1"
+    fast-glob: "npm:^3.3.2"
+    glob: "npm:^11.0.0"
+    html-webpack-plugin: "npm:^5.6.2"
+    js-yaml: "npm:^4.1.0"
+    koa: "npm:^2.15.3"
+    koa-static: "npm:^5.0.0"
+    less: "npm:^4.2.0"
+    less-loader: "npm:^12.2.0"
+    listr2: "npm:^8.2.5"
+    mini-css-extract-plugin: "npm:^2.9.0"
+    mri: "npm:^1.2.0"
+    node-gyp: "npm:^10.2.0"
+    node-polyfill-webpack-plugin: "npm:^4.0.0"
+    npm-run-all: "npm:^4.1.5"
+    null-loader: "npm:^4.0.1"
+    optimize-css-assets-webpack-plugin: "npm:^6.0.1"
+    process: "npm:^0.11.10"
+    react: "npm:^18.3.1"
+    react-dom: "npm:^18.3.1"
+    standard-version: "npm:^9.5.0"
+    style-loader: "npm:^4.0.0"
+    style-resources-loader: "npm:^1.5.0"
+    tdesign-icons-react: "npm:^0.6.2"
+    ts-loader: "npm:^9.5.1"
+    ts-node: "npm:^10.9.2"
+    tsconfig-paths: "npm:^4.2.0"
+    tsconfig-paths-webpack-plugin: "npm:^4.1.0"
+    typescript: "npm:^5.5.3"
+    undici-types: "npm:^6.20.0"
+    webpack: "npm:^5.94.0"
+    webpack-cli: "npm:^5.1.4"
+    webpack-dev-server: "npm:^5.2.0"
+    webpack-merge: "npm:^6.0.1"
+    webpack-node-externals: "npm:^3.0.0"
+    yauzl: "npm:^3.1.3"
+  dependenciesMeta:
+    "@parcel/watcher":
+      built: false
+    "@vscode/spdlog":
+      built: false
+    keytar:
+      built: false
+    node-pty:
+      built: false
+    nsfw:
+      built: false
+    spdlog:
+      built: false
+  languageName: unknown
+  linkType: soft
+
 "optimize-css-assets-webpack-plugin@npm:^6.0.1":
   version: 6.0.1
   resolution: "optimize-css-assets-webpack-plugin@npm:6.0.1"
@@ -14036,6 +14314,19 @@ __metadata:
     mkdirp: "npm:^3.0.1"
     yallist: "npm:^5.0.0"
   checksum: 10/12a2a4fc6dee23e07cc47f1aeb3a14a1afd3f16397e1350036a8f4cdfee8dcac7ef5978337a4e7b2ac2c27a9a6d46388fc2088ea7c80cb6878c814b1425f8ecf
+  languageName: node
+  linkType: hard
+
+"tdesign-icons-react@npm:^0.6.2":
+  version: 0.6.2
+  resolution: "tdesign-icons-react@npm:0.6.2"
+  dependencies:
+    "@babel/runtime": "npm:^7.16.5"
+    classnames: "npm:^2.2.6"
+  peerDependencies:
+    react: ">=16.13.1"
+    react-dom: ">=16.13.1"
+  checksum: 10/ac67255e3a3df885adb10b9ac42fe42f1af9fd9523a6ff046954ceb701136853e2a6b59735c70764c623bb5c6198eab1bee40ecdee8d538fdc39fefa2390a5d7
   languageName: node
   linkType: hard
 

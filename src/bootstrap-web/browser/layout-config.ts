@@ -1,13 +1,23 @@
 import { SlotLocation } from '@opensumi/ide-core-browser/lib/react-providers/slot';
 import { defaultConfig } from '@opensumi/ide-main-layout/lib/browser/default-config';
 import { DESIGN_MENUBAR_CONTAINER_VIEW_ID } from '@opensumi/ide-design/lib/common/constants';
-import {DESIGN_MENU_BAR_LEFT} from "@opensumi/ide-design";
-import {AI_MENU_BAR_LEFT_ACTION} from "@/ai/browser";
 
 export const layoutConfig = {
   ...defaultConfig,
   [SlotLocation.top]: {
     modules: [DESIGN_MENUBAR_CONTAINER_VIEW_ID],
+  },
+  [SlotLocation.left]: {
+    modules: [
+      '@opensumi/ide-explorer',
+      'singlefile-container',
+      'sample-test-container',
+      '@opensumi/ide-extension-manager',
+      '@opensumi/ide-debug',
+    ],
+  },
+  [SlotLocation.main]: {
+    modules: ['@opensumi/ide-editor'],
   },
   [SlotLocation.bottom]: {
     modules: [
@@ -18,8 +28,4 @@ export const layoutConfig = {
       '@opensumi/ide-refactor-preview',
     ],
   },
-
-  [DESIGN_MENU_BAR_LEFT]: {
-    modules: [AI_MENU_BAR_LEFT_ACTION]
-  }
 };

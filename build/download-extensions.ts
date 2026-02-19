@@ -7,12 +7,14 @@ import { pipeline } from 'stream/promises'
 import { ReadableStream } from 'stream/web'
 import { randomUUID } from 'crypto';
 import { promisify } from 'util';
+import { spawn } from 'child_process';
 import debug from 'debug'
 import { extensions } from './extensions.json'
 
 const d = debug('download-extension')
 
 const extensionsDir = path.resolve('extensions');
+const builtinScript = path.resolve('build', 'builtin-extensions.mjs');
 
 const parallelRunPromise = (lazyPromises: (() => Promise<void>)[], n: number) => {
   let working = 0;
@@ -182,7 +184,24 @@ export const downloadExtensions = async (force = false) => {
   }
 
   await parallelRunPromise(promises, 2);
+  await prepareBuiltinExtensions();
   d('安装完毕');
+};
+
+const prepareBuiltinExtensions = async () => {
+  if (!fs.existsSync(builtinScript)) {
+    d('未找到内置扩展构建脚本，跳过');
+    return;
+  }
+
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn('node', [builtinScript], { stdio: 'inherit' });
+    child.on('error', reject);
+    child.on('exit', (code) => {
+      if (code === 0) resolve();
+      else reject(new Error(`builtin extensions build failed with code ${code}`));
+    });
+  });
 };
 
 if (require.main === module) {

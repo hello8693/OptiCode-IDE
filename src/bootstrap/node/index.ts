@@ -16,10 +16,8 @@ import { ExtensionModule } from '@opensumi/ide-extension/lib/node';
 import { FileSchemeNodeModule } from '@opensumi/ide-file-scheme/lib/node';
 import { AddonsModule } from '@opensumi/ide-addons/lib/node';
 import { OpenVsxExtensionManagerModule } from '@opensumi/ide-extension-manager/lib/node';
-import { AINativeModule } from '@opensumi/ide-ai-native/lib/node';
 import { CoreNodeModule } from '@/core/node';
 import { LoggerModule } from '@/logger/node'
-import { AIServiceModule } from '@/ai/node';
 
 const modules: ConstructorOf<NodeModule>[] = [
   ServerCommonModule,
@@ -35,9 +33,6 @@ const modules: ConstructorOf<NodeModule>[] = [
   AddonsModule,
   CoreNodeModule,
   LoggerModule,
-  // ai
-  AINativeModule,
-  AIServiceModule,
 ]
 
 startServer();

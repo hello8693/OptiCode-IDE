@@ -5,3 +5,121 @@ select.kt_select {
 quick-open-container {
   top: 36px !important;
 }
+
+:root {
+  --radius-small: 0px !important;
+  --radius-medium: 0px !important;
+  --radius-large: 0px !important;
+  --button-radius: 0px !important;
+  --input-radius: 0px !important;
+  --overlay-radius: 0px !important;
+  --panel-radius: 0px !important;
+  --side-bar-radius: 0px !important;
+  --tab-radius: 0px !important;
+  --dropdown-radius: 0px !important;
+  --modal-radius: 0px !important;
+
+  // 缩小面板间隙
+  --kt-split-panel-margin: 0px;
+  --kt-split-handle-size: 1px;
+}
+
+// 去除主要视图可能的圆角
+div, section, main {
+  border-radius: 0 !important;
+}
+
+// 解决面板间隙过大问题
+:global {
+  .kt-split-panel {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .sumi-split-panel {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  .kt-split-handle {
+    margin: 0 !important;
+    padding: 0 !important;
+    &::after {
+      display: none !important;
+    }
+  }
+  // 去除侧边条和面板之间的间隙
+  .sumi-main-content {
+    padding: 0 !important;
+  }
+  .kt-panel, .sumi-panel {
+    margin: 0 !important;
+  }
+}
+
+// 针对 OptiCode IDE 设计规范中常见的圆角类名
+[class*="radius"], [class*="Radius"], [class*="rounded"] {
+  border-radius: 0 !important;
+}
+
+// 让左侧顶部的额外菜单（设置等）使用与侧栏图标一致的 icon_tab 样式
+:global {
+  .left_tab_bar .extra_top_menus .design-iconAction,
+  .left_tab_bar .extra_top_menus .iconAction {
+    width: 48px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--activityBar-inactiveForeground);
+  }
+
+  .left_tab_bar .extra_top_menus .design-iconAction:hover,
+  .left_tab_bar .extra_top_menus .iconAction:hover {
+    color: var(--activityBar-foreground);
+    background: transparent;
+  }
+
+  .left_tab_bar .extra_top_menus .design-iconAction .kt-icon,
+  .left_tab_bar .extra_top_menus .iconAction .kt-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  // 隐藏侧栏底部的额外按钮（包含设置）
+  .left_tab_bar > .vertical_icons:not(.extra_top_menus) {
+    display: none;
+  }
+}
+
+// 标题栏整体可拖拽修复
+:global(#top) {
+  -webkit-app-region: drag;
+  -webkit-user-select: none;
+  user-select: none;
+
+  // 这里的选择器用于排除顶部栏中所有需要点击交互的区域
+  // 确保 logo、菜单栏、工具栏按钮等可以正常点击
+  .sumi-menubar-logo,
+  .sumi-menubar-left,
+  .sumi-menubar-right,
+  .sumi-menubar-center,
+  .menubarWrapper,
+  .menu-bar,
+  .kt-menubar,
+  .sumi-toolbar-action,
+  .sumi-toolbar-multi-action,
+  .sumi-menubar-item,
+  button,
+  a,
+  [role="button"],
+  [data-component="menubar-item"],
+  .windowActions,
+  input,
+  select {
+    -webkit-app-region: no-drag;
+  }
+}

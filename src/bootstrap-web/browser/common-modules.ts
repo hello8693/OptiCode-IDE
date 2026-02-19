@@ -41,8 +41,6 @@ import { TaskModule } from '@opensumi/ide-task/lib/browser';
 import { TestingModule } from '@opensumi/ide-testing/lib/browser';
 import {CoreBrowserModule} from "@/core/browser";
 import {DesignModule} from "@opensumi/ide-design/lib/browser";
-import {AINativeModule} from "@opensumi/ide-ai-native/lib/browser";
-import {AIFeatureModule} from "@/ai/browser";
 import {AutoUpdaterModule} from "@/auto-updater/browser";
 
 export const CommonBrowserModules: ConstructorOf<BrowserModule>[] = [
@@ -87,9 +85,6 @@ export const CommonBrowserModules: ConstructorOf<BrowserModule>[] = [
   TaskModule,
   CoreBrowserModule,
   TestingModule, RemoteOpenerModule,
-  // ai
   DesignModule,
-  AINativeModule,
-  AIFeatureModule,
   AutoUpdaterModule,
 ];

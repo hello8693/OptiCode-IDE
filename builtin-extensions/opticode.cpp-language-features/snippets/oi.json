@@ -1,0 +1,19 @@
+{
+  "using namespace std": {
+    "prefix": ["using", "std"],
+    "body": [
+      "using namespace std;"
+    ],
+    "description": "Insert using namespace std;"
+  },
+  "oi main": {
+    "prefix": ["main", "oi-main"],
+    "body": [
+      "int main() {",
+      "    // your code here",
+      "    return 0;",
+      "}"
+    ],
+    "description": "OI-friendly main with fast IO"
+  }
+}

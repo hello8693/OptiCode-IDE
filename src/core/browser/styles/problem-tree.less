@@ -1,0 +1,234 @@
+@import './oi-panel.less';
+
+.problem-list-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--kt-sideBar-background);
+  color: var(--kt-sideBar-foreground);
+}
+
+/* ── 顶部工具栏区域 ── */
+.problem-toolbar {
+  flex-shrink: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--kt-panel-border, #2b2b2b);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: var(--kt-sideBar-background);
+}
+
+.problem-toolbar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.problem-toolbar__title {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--kt-sideBarSectionHeader-foreground);
+  letter-spacing: 0.5px;
+}
+
+.problem-toolbar__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.problem-search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.problem-search-input {
+  width: 100%;
+  height: 24px;
+  padding: 0 6px;
+  background-color: var(--kt-input-background, #3c3c3c);
+  color: var(--kt-input-foreground, #cccccc);
+  border: 1px solid var(--kt-input-border, #3c3c3c);
+  border-radius: 0;
+  font-size: 12px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--kt-focusBorder, #007fd4);
+  }
+
+  &::placeholder {
+    color: var(--kt-input-placeholderForeground, #a6a6a6);
+  }
+}
+
+.problem-filter-tabs {
+  display: flex;
+  gap: 2px;
+  margin-top: 4px;
+}
+
+/* ── 列表区域（模拟原生 Tree） ── */
+.problem-list-body {
+  flex: 1;
+  overflow-y: overlay;
+  overflow-x: hidden;
+  padding-top: 4px;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--kt-scrollbarSlider-background, #424242);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: var(--kt-scrollbarSlider-hoverBackground, #4f4f4f);
+  }
+}
+
+/* 统一的树节点样式 */
+.tree-node {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  padding-right: 8px;
+  cursor: pointer;
+  user-select: none;
+  color: var(--kt-sideBar-foreground);
+  position: relative;
+
+  &.is-active {
+    background: var(--kt-list-activeSelectionBackground, #094771);
+    color: var(--kt-list-activeSelectionForeground, #fff);
+
+    .node-label,
+    .node-sub-label {
+      color: var(--kt-list-activeSelectionForeground, #fff);
+      opacity: 1;
+    }
+  }
+
+  &:hover {
+    background-color: var(--kt-list-hoverBackground, #2a2d2e);
+    
+    .node-actions {
+      display: flex;
+    }
+  }
+
+  &.is-file {
+    color: var(--kt-sideBar-foreground);
+  }
+  
+  /* 层级缩进计算：padding-left = level * 16px + 8px */
+}
+
+/* 节点内容布局 */
+.node-content {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
+}
+
+.node-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 100%;
+  font-size: 12px;
+  flex-shrink: 0;
+  opacity: 0.8;
+  
+  &.is-hidden {
+    visibility: hidden;
+  }
+}
+
+.node-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.node-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  line-height: 22px;
+}
+
+.node-sub-label {
+  font-size: 11px;
+  opacity: 0.5;
+  margin-left: 6px;
+  font-weight: normal;
+}
+
+.node-tag {
+  font-size: 10px;
+  padding: 0 4px;
+  border-radius: 0;
+  background-color: var(--kt-badge-background, #4d4d4d);
+  color: var(--kt-badge-foreground, #ffffff);
+  margin-left: 6px;
+  height: 16px;
+  line-height: 16px;
+}
+
+/* 悬浮操作栏 */
+.node-actions {
+  display: none; /* 默认隐藏，hover时显示 */
+  align-items: center;
+  gap: 2px;
+  margin-left: auto;
+}
+
+
+/* ── 底部状态栏 ── */
+.problem-statusbar {
+  flex-shrink: 0;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-top: 1px solid var(--kt-panel-border, #2b2b2b);
+  font-size: 11px;
+  color: var(--kt-statusBar-foreground);
+  background-color: var(--kt-statusBar-background, #007fd4);
+  
+  /* 这里使用侧边栏底部的风格，如果不希望太显眼，可以改用透明背景 */
+  background-color: var(--kt-sideBar-background);
+  color: var(--kt-sideBar-foreground);
+  opacity: 0.8;
+}
+
+.status-item {
+  margin-right: 12px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--kt-foreground);
+  opacity: 0.6;
+  font-size: 13px;
+  gap: 8px;
+  text-align: center;
+  padding: 20px;
+}

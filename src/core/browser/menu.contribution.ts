@@ -8,8 +8,8 @@ import { IAppMenuService } from '../common';
 import { IElectronMainUIService } from '@opensumi/ide-core-common/lib/electron';
 
 const OPEN_LOGO_DIR_COMMAND_ID = {
-  id: 'codefuse-ide.openLogDir',
-  label: localize('codefuse-ide.openLogDir'),
+  id: 'opticode-ide.openLogDir',
+  label: localize('opticode-ide.openLogDir'),
 }
 
 @Domain(ClientAppContribution, MenuContribution, CommandContribution)

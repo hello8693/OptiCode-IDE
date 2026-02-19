@@ -2,7 +2,6 @@ import {Injector} from '@opensumi/di';
 import {IClientAppOpts} from '@opensumi/ide-core-browser';
 import {ClientApp} from '@opensumi/ide-core-browser/lib/bootstrap/app';
 import {ToolbarActionBasedLayout} from '@opensumi/ide-core-browser/lib/components';
-import logo from '@/core/browser/assets/logo.svg'
 import {CoreCommandContribution} from "@/bootstrap-web/browser/core-commands";
 
 export async function renderApp(opts: IClientAppOpts) {
@@ -15,7 +14,7 @@ export async function renderApp(opts: IClientAppOpts) {
   const serverPort = process.env.DEVELOPMENT ? 8000 : window.location.port;
   const staticServerPort = process.env.DEVELOPMENT ? 8080 : window.location.port;
   const webviewEndpointPort = process.env.DEVELOPMENT ? 8899 : window.location.port;
-  opts.appName= 'CodeFuse IDE';
+  opts.appName= 'OptiCode IDE';
   opts.workspaceDir = opts.workspaceDir || query.get('workspaceDir') || process.env.WORKSPACE_DIR;
 
   opts.extensionDir = opts.extensionDir || process.env.EXTENSION_DIR;
@@ -29,11 +28,6 @@ export async function renderApp(opts: IClientAppOpts) {
   opts.layoutComponent = opts.layoutComponent || ToolbarActionBasedLayout;
   opts.injector = injector
   opts.isElectronRenderer = false
-  opts.AINativeConfig = {
-    layout: {
-      menubarLogo: logo,
-    }
-  }
   const app = new ClientApp(opts);
 
   app.fireOnReload = () => {

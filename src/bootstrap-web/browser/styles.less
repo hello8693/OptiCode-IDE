@@ -10,3 +10,38 @@
   overflow: hidden;
   background-color: var(--background);
 }
+
+// 让左侧顶部的额外菜单（设置等）使用与侧栏图标一致的 icon_tab 样式
+:global {
+  .left_tab_bar .extra_top_menus .design-iconAction,
+  .left_tab_bar .extra_top_menus .iconAction {
+    width: 48px;
+    height: 40px;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--activityBar-inactiveForeground);
+  }
+
+  .left_tab_bar .extra_top_menus .design-iconAction:hover,
+  .left_tab_bar .extra_top_menus .iconAction:hover {
+    color: var(--activityBar-foreground);
+    background: transparent;
+  }
+
+  .left_tab_bar .extra_top_menus .design-iconAction .kt-icon,
+  .left_tab_bar .extra_top_menus .iconAction .kt-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  // 隐藏侧栏底部的额外按钮（包含设置）
+  .left_tab_bar > .vertical_icons:not(.extra_top_menus) {
+    display: none;
+  }
+}

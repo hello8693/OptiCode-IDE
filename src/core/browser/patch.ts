@@ -1,4 +1,4 @@
-import { Autowired, Provider } from '@opensumi/di'
+import { Autowired, Provider, Injectable } from '@opensumi/di'
 import { Domain, Schemes, URI } from '@opensumi/ide-core-common'
 import { AppConfig, WorkspaceScope } from '@opensumi/ide-core-browser'
 import { IMenuRegistry, MenuId, MenuContribution, IMenuItem } from "@opensumi/ide-core-browser/lib/menu/next";
@@ -7,6 +7,10 @@ import { IViewsRegistry } from '@opensumi/ide-main-layout';
 import { RESOURCE_VIEW_ID } from '@opensumi/ide-file-tree-next'
 import { IPreferenceSettingsService } from '@opensumi/ide-core-browser/lib/preferences';
 import { PreferenceSettingsService } from '@opensumi/ide-preferences/lib/browser/preference-settings.service'
+import { VSXExtensionService } from '@opensumi/ide-extension-manager/lib/browser/vsx-extension.service';
+import { AbstractExtInstanceManagementService } from '@opensumi/ide-extension/lib/browser/types';
+import { VSXExtensionServiceToken } from '@opensumi/ide-extension-manager/lib/common';
+import { transaction } from '@opensumi/ide-monaco/lib/common/observable';
 
 @Domain(ClientAppContribution, MenuContribution, StaticResourceContribution)
 export class PatchContribution implements MenuContribution, ClientAppContribution, StaticResourceContribution {
@@ -70,11 +74,71 @@ export class PatchPreferenceSettingsService extends PreferenceSettingsService {
   }
 }
 
+@Injectable()
+export class PatchVSXExtensionService extends VSXExtensionService {
+  @Autowired(AbstractExtInstanceManagementService)
+  protected readonly _extensionInstanceService: AbstractExtInstanceManagementService;
+
+  private isHiddenExtensionId(extensionId?: string, name?: string, publisher?: string) {
+    const extId = extensionId?.toLowerCase() || '';
+    const extName = name?.toLowerCase() || '';
+    const extPublisher = publisher?.toLowerCase() || '';
+    return extId.startsWith('opticode.') || extId.startsWith('vscode.') ||
+      extName.startsWith('opticode.') || extName.startsWith('vscode.') ||
+      extPublisher === 'opticode' || extPublisher === 'vscode';
+  }
+
+  getInstalledExtensions() {
+    // 隐藏 opticode 相关插件
+    const installedExtensions = this._extensionInstanceService.getExtensionInstances()
+      .filter((e) => {
+        return !this.isHiddenExtensionId(e.extensionId, e.packageJSON.name, e.packageJSON.publisher);
+      })
+      .map((e) => {
+        const extensionId = e.extensionId;
+        const namespace = extensionId && extensionId.includes('.') ? extensionId.split('.')[0] : e.packageJSON.publisher;
+
+        return {
+          namespace,
+          name: e.packageJSON.name,
+          extensionId: e.extensionId,
+          version: e.packageJSON.version,
+          displayName: e.packageJSON.displayName,
+          description: e.packageJSON.description,
+          publisher: e.packageJSON.publisher,
+          iconUrl: e.packageJSON.icon && e.extensionLocation.toString() + `/${e.packageJSON.icon}`,
+          path: e.path,
+          realpath: e.realPath,
+        };
+      });
+      
+    transaction((tx) => {
+       // @ts-ignore
+      this.installedExtensionsObservable.set(installedExtensions, tx);
+    });
+  }
+
+  async search(keyword: string) {
+    await super.search(keyword);
+    transaction((tx) => {
+      this.extensionsObservable.set(
+        this.extensions.filter((ext) => !this.isHiddenExtensionId(this.getExtensionId(ext), ext.name, ext.publisher)),
+        tx,
+      );
+    });
+  }
+}
+
 export const patchProviders: Provider[] = [
   PatchContribution,
   {
     token: IPreferenceSettingsService,
     useClass: PatchPreferenceSettingsService,
+    override: true,
+  },
+  {
+    token: VSXExtensionServiceToken,
+    useClass: PatchVSXExtensionService,
     override: true,
   }
 ]

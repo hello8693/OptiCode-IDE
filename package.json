@@ -1,11 +1,13 @@
 {
-  "name": "codefuse-ide",
+  "name": "opticode-ide",
   "version": "0.7.0",
-  "description": "CodeFuse AI Native IDE",
+  "description": "OptiCode IDE",
   "main": "out/main",
   "scripts": {
     "start": "electron-forge start",
     "start-web": "ts-node build/webpack-web/web-start.ts",
+    "build:builtin-extensions": "node build/builtin-extensions.mjs",
+    "prestart": "yarn build:builtin-extensions",
     "electron-rebuild": "node -r ts-node/register ./build/rebuild.ts",
     "web-rebuild": "node -r ts-node/register ./build/rebuild.ts --target=web",
     "build-web": "webpack --config ./build/webpack-web/webpack.config.ts --progress --color",
@@ -17,14 +19,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@code.alipay.com:cloud-ide/codefuse-ide.git"
+    "url": "git@code.alipay.com:cloud-ide/opticode-ide.git"
   },
   "keywords": [
     "AI",
     "IDE"
   ],
   "author": {
-    "name": "CodeFuse"
+    "name": "OptiCode IDE"
   },
   "license": "MIT",
   "devDependencies": {
@@ -41,6 +43,7 @@
     "@types/node": "^22.8.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.1",
+    "@types/vscode": "^1.80.0",
     "app-builder-bin": "^4.2.0",
     "app-builder-lib": "25.1.8",
     "asar": "^3.2.0",
@@ -51,6 +54,7 @@
     "css-loader": "^6",
     "debug": "^4.3.7",
     "electron": "30.1.2",
+    "esbuild": "^0.24.0",
     "extract-zip": "^2.0.1",
     "fast-glob": "^3.3.2",
     "glob": "^11.0.0",
@@ -142,7 +146,8 @@
     "mri": "^1.2.0",
     "process": "^0.11.10",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "tdesign-icons-react": "^0.6.2"
   },
   "packageManager": "yarn@4.3.1",
   "resolutions": {

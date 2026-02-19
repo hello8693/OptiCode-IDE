@@ -13,8 +13,6 @@ import { FileSchemeNodeModule } from '@opensumi/ide-file-scheme/lib/node';
 import { AddonsModule } from '@opensumi/ide-addons/lib/node';
 import {CoreNodeModule} from "@/core/node";
 import {LoggerModule} from "@/logger/node";
-import {AINativeModule} from "@opensumi/ide-ai-native/lib/node";
-import {AIServiceModule} from "@/ai/node";
 
 export const CommonNodeModules: ConstructorOf<NodeModule>[] = [
   ServerCommonModule,
@@ -31,7 +29,4 @@ export const CommonNodeModules: ConstructorOf<NodeModule>[] = [
   CoreNodeModule,
   LoggerModule,
   OpenerModule,
-  // ai
-  AINativeModule,
-  AIServiceModule,
 ];

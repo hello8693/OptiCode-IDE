@@ -37,6 +37,6 @@ export const localizationBundle = {
     'ai.model.go': 'Go',
 
     'autoUpdater.checkForUpdates': 'Check for Updates...',
-    'codefuse-ide.openLogDir': 'Open Log Folder',
+    'opticode-ide.openLogDir': 'Open Log Folder',
   },
 };

@@ -19,6 +19,7 @@ const modules = [
 startMain();
 
 function startMain() {
+  process.env.IDE_STORAGE_PATH = path.join(app.getPath('userData'), 'user', 'storage.json');
   const mainApp = new ElectronMainApp({
     modules,
     browserUrl: __CODE_WINDOW_DEV_SERVER_URL__ || URI.file(path.join(__dirname, `../renderer/${__CODE_WINDOW_NAME__}/index.html`)).toString(),

@@ -1,0 +1,513 @@
+/* ──── 侧边栏面板公共样式 ──── */
+
+.oi-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 8px 10px;
+  gap: 0;
+  font-size: 12px;
+  color: var(--kt-foreground, #ccc);
+}
+
+/* ── 头部 ── */
+.oi-panel__header {
+  padding: 4px 0 12px;
+  border-bottom: 1px solid var(--kt-panel-border, #3c3c3c);
+  margin-bottom: 8px;
+}
+
+.oi-panel__body-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.oi-panel__title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--kt-sideBarTitle-foreground, #ccc);
+}
+
+/* ── 区块标题 ── */
+.oi-panel__section {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--kt-sideBarSectionHeader-foreground, #888);
+  margin: 14px 0 8px;
+  user-select: none;
+}
+
+.oi-panel__section:first-child {
+  margin-top: 2px;
+}
+
+/* ── 按钮行 ── */
+.oi-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.oi-panel__actions--split {
+  flex-wrap: nowrap;
+}
+
+.oi-panel__actions--center {
+  justify-content: center;
+}
+
+.oi-panel__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+/* ── 主按钮 ── */
+.oi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: var(--kt-button-secondaryBackground, #3a3d41);
+  color: var(--kt-button-secondaryForeground, #fff);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.oi-btn:hover {
+  background: var(--kt-button-secondaryHoverBackground, #45494e);
+}
+
+.oi-btn:active {
+  opacity: 0.8;
+}
+
+.oi-btn:disabled {
+  background: var(--kt-button-disableBackground, #3a3d41);
+  color: var(--kt-button-disableForeground, #777);
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* 高亮按钮 */
+.oi-btn__primary {
+  background: var(--kt-button-background, #0e639c);
+  color: var(--kt-button-foreground, #fff);
+}
+
+.oi-btn__primary:hover {
+  background: var(--kt-button-hoverBackground, #1177bb);
+}
+
+/* 大按钮 */
+.oi-btn__large {
+  width: 100%;
+  height: 30px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.oi-panel__actions--split .oi-btn__large {
+  width: auto;
+}
+
+/* 幽灵按钮 */
+.oi-btn__ghost {
+  background: transparent;
+  color: var(--kt-foreground, #ccc);
+  border: 1px solid var(--kt-input-border, #3c3c3c);
+  height: 24px;
+}
+
+.oi-btn__ghost:hover {
+  background: var(--kt-button-secondaryHoverBackground, #2a2d2e);
+  border-color: var(--kt-focusBorder, #007fd4);
+}
+
+.oi-btn__small {
+  height: 20px;
+  padding: 0 6px;
+  font-size: 10px;
+}
+
+.oi-btn__tiny {
+  height: 18px;
+  padding: 0 4px;
+  font-size: 10px;
+}
+
+.oi-btn__danger {
+  color: var(--kt-errorForeground, #f48771);
+}
+
+.oi-btn__half {
+  flex: 1 1 50%;
+  min-width: 0;
+  max-width: 50%;
+}
+
+.oi-btn__danger:hover {
+  background: rgba(244, 135, 113, 0.08);
+}
+
+.oi-btn__icon {
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border-radius: 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--kt-actionbar-foreground, var(--kt-icon-foreground, #ccc));
+}
+
+.oi-btn__icon:hover {
+  background: var(--kt-icon-hoverBackground, rgba(90, 93, 94, 0.31));
+}
+
+.oi-btn__icon:disabled {
+  color: var(--kt-actionbar-disableForeground, #777);
+  background: transparent;
+}
+
+.oi-btn__tab {
+  flex: 1;
+  height: 22px;
+  padding: 0;
+  font-size: 11px;
+  background: transparent;
+  color: var(--kt-foreground, #ccc);
+  border: 1px solid var(--kt-input-border, #3c3c3c);
+}
+
+.oi-btn__tab:hover {
+  background: var(--kt-button-secondaryHoverBackground, #2a2d2e);
+}
+
+.oi-btn__tab.is-active {
+  background: var(--kt-button-background, #0e639c);
+  color: var(--kt-button-foreground, #fff);
+  border-color: var(--kt-button-background, #0e639c);
+}
+
+/* ── 编译参数列表 ── */
+.oi-flag-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.oi-flag-item {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  border-radius: 0;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.oi-flag-item:hover {
+  background: var(--kt-list-hoverBackground, #2a2d2e);
+}
+
+/* ── 信息行 ── */
+.oi-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  background: var(--kt-input-background, #1e1e1e);
+  border: 1px solid var(--kt-input-border, #3c3c3c);
+  border-radius: 0;
+  color: var(--kt-input-foreground, #d4d4d4);
+  margin: 4px 0;
+  min-height: 24px;
+}
+
+.oi-info__tag {
+  display: inline-block;
+  padding: 1px 4px;
+  font-size: 9px;
+  line-height: 1.2;
+  border-radius: 0;
+  background: var(--kt-badge-background, #4d4d4d);
+  color: var(--kt-badge-foreground, #fff);
+  font-weight: 600;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+/* ── 空状态 ── */
+.oi-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 12px;
+  padding: 40px 10px;
+  color: var(--kt-descriptionForeground, #888);
+  font-size: 11px;
+  text-align: center;
+}
+
+/* ── 分割线 ── */
+.oi-divider {
+  height: 1px;
+  background: var(--kt-panel-border, #3c3c3c);
+  margin: 16px 0 8px;
+  opacity: 0.5;
+}
+
+/* ── 样例卡片 ── */
+
+/* ── 题目信息卡片 ── */
+.oi-problem-card {
+  border: 1px solid var(--kt-panel-border, #3c3c3c);
+  border-radius: 0;
+  overflow: hidden;
+  background: var(--kt-editorWidget-background, #252526);
+  margin: 4px 0;
+}
+
+.oi-problem-card__title {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  font-size: 12px;
+  background: var(--kt-sideBarSectionHeader-background, #1e1e1e);
+  border-bottom: 1px solid var(--kt-panel-border, #3c3c3c);
+}
+
+.oi-problem-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  font-size: 10px;
+  color: var(--kt-descriptionForeground, #888);
+}
+
+/* ── 题目列表 ── */
+.oi-problem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.oi-problem-list__item {
+  display: flex;
+  align-items: center;
+  padding: 5px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.1s;
+  user-select: none;
+}
+
+.oi-problem-list__item:hover {
+  background: var(--kt-list-hoverBackground, #2a2d2e);
+}
+
+.oi-problem-list__item--active {
+  background: var(--kt-list-activeSelectionBackground, #094771);
+  color: var(--kt-list-activeSelectionForeground, #fff);
+}
+
+.oi-problem-list__item--active:hover {
+  background: var(--kt-list-activeSelectionBackground, #094771);
+}
+
+.oi-problem-list__actions {
+  display: none;
+  gap: 4px;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.oi-problem-list__item:hover .oi-problem-list__actions {
+  display: inline-flex;
+}
+
+/* ── 样例卡片 ── */
+.oi-case {
+  border: 1px solid var(--kt-panel-border, #3c3c3c);
+  border-radius: 0;
+  margin-top: 12px;
+  overflow: hidden;
+  background: var(--kt-editorWidget-background, #252526);
+}
+
+.oi-case__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: var(--kt-sideBarSectionHeader-background, #1e1e1e);
+  border-bottom: 1px solid var(--kt-panel-border, #3c3c3c);
+  font-size: 11px;
+  font-weight: 600;
+  user-select: none;
+}
+
+.oi-case__close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  border-radius: 4px;
+  color: var(--kt-foreground, #ccc);
+}
+
+.oi-case__close-btn:hover {
+  background: var(--kt-button-secondaryHoverBackground, #45494e);
+  color: var(--kt-errorForeground, #f48771);
+}
+
+.oi-case__body {
+  display: block;
+}
+
+.oi-case__col {
+  padding: 8px 10px;
+}
+
+.oi-case__col + .oi-case__col {
+  border-top: 1px solid var(--kt-panel-border, #3c3c3c);
+}
+
+.oi-case__col-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--kt-descriptionForeground, #888);
+  margin-bottom: 4px;
+  user-select: none;
+  text-transform: uppercase;
+}
+
+.oi-sample-file {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+}
+
+.oi-sample-file__hint {
+  font-size: 10px;
+  color: var(--kt-descriptionForeground, #888);
+}
+
+/* ── 文本域 ── */
+.oi-textarea {
+  display: block;
+  width: 100%;
+  min-height: 44px;
+  max-height: 200px;
+  resize: vertical;
+  font-family: var(--kt-editor-font-family, 'Menlo, Monaco, Consolas, monospace');
+  font-size: 12px;
+  line-height: 1.4;
+  padding: 6px 8px;
+  box-sizing: border-box;
+  border: 1px solid var(--kt-input-border, #3c3c3c);
+  border-radius: 0;
+  background: var(--kt-input-background, #1e1e1e);
+  color: var(--kt-input-foreground, #d4d4d4);
+  outline: none;
+}
+
+.oi-textarea:focus {
+  border-color: var(--kt-focusBorder, #007fd4);
+}
+
+/* ── 判定状态 ── */
+.oi-verdict {
+  padding: 4px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: right;
+  border-top: 1px solid var(--kt-panel-border, #3c3c3c);
+}
+
+.oi-verdict--AC {
+  background: #1b4332;
+  color: #52c41a;
+}
+
+.oi-verdict--WA {
+  background: #5a1d1d;
+  color: #f5222d;
+}
+
+.oi-verdict--TLE {
+  background: #4a3800;
+  color: #faad14;
+}
+
+.oi-verdict--RE {
+  background: #3b1d69;
+  color: #b37feb;
+}
+
+.oi-verdict--CE {
+  background: #4a3800;
+  color: #faad14;
+}
+
+.oi-verdict--MLE {
+  background: #4d2b00;
+  color: #d48806;
+}
+
+.oi-verdict--PENDING {
+  background: var(--kt-badge-background, #4d4d4d);
+  color: var(--kt-badge-foreground, #ccc);
+}
+
+.oi-verdict--RUNNING {
+  background: #1a3a5c;
+  color: #40a9ff;
+}
+
+/* ── 分隔线 ── */
+.oi-divider {
+  height: 1px;
+  background: var(--kt-panel-border, #3c3c3c);
+  margin: 6px 0;
+}
+
+/* ── 空状态 ── */
+.oi-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px 0;
+  color: var(--kt-descriptionForeground, #888);
+  font-size: 11px;
+  text-align: center;
+}

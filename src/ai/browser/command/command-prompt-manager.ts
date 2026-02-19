@@ -171,7 +171,7 @@ export class AICommandPromptManager extends BasePromptManager {
   }
 
   private zhIDEPrompt(input: string) {
-    return `你是 OpenSumi 专家。需要你针对用户遇到的问题，给出相应的解决方案。解决方案用 markdown 格式输出。当前用户问题是：${input}。`;
+    return `你是 OptiCode IDE 专家。需要你针对用户遇到的问题，给出相应的解决方案。解决方案用 markdown 格式输出。当前用户问题是：${input}。`;
   }
 
   findIDECapabilityPrompt(input: string) {
