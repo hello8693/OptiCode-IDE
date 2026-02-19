@@ -368,6 +368,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@electron-forge/maker-base@npm:7.11.1":
+  version: 7.11.1
+  resolution: "@electron-forge/maker-base@npm:7.11.1"
+  dependencies:
+    "@electron-forge/shared-types": "npm:7.11.1"
+    fs-extra: "npm:^10.0.0"
+    which: "npm:^2.0.2"
+  checksum: 10/ae3975bb92a551098b406be484cfd20b30dc5127d5def3b942578eddf82ceee87a486205466930c9fe26a549d8c7d819abfdc205d4e14cd3bc9283d7d5e269c5
+  languageName: node
+  linkType: hard
+
 "@electron-forge/maker-base@npm:7.6.0":
   version: 7.6.0
   resolution: "@electron-forge/maker-base@npm:7.6.0"
@@ -379,18 +390,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@electron-forge/maker-squirrel@npm:^7.5.0":
-  version: 7.6.0
-  resolution: "@electron-forge/maker-squirrel@npm:7.6.0"
+"@electron-forge/maker-squirrel@npm:^7.11.1":
+  version: 7.11.1
+  resolution: "@electron-forge/maker-squirrel@npm:7.11.1"
   dependencies:
-    "@electron-forge/maker-base": "npm:7.6.0"
-    "@electron-forge/shared-types": "npm:7.6.0"
+    "@electron-forge/maker-base": "npm:7.11.1"
+    "@electron-forge/shared-types": "npm:7.11.1"
     electron-winstaller: "npm:^5.3.0"
     fs-extra: "npm:^10.0.0"
   dependenciesMeta:
     electron-winstaller:
       optional: true
-  checksum: 10/09f0375a8f47d8c7664724909149a1945388120b22bce8184bd24deb5dfbcb77448eb5c56eb512e70f94102d283390b2506a1c42a465eb4987949fdf230b9c37
+  checksum: 10/df9b6fb1c5ff539165506c1a72f1355731704f14e838972f71bdc672a7d983c378bfe9662d9e3b1955c941f0f64d921ec9b48ff846394c71c819ed7ba7c23ef9
   languageName: node
   linkType: hard
 
@@ -443,6 +454,18 @@ __metadata:
   dependencies:
     "@electron-forge/shared-types": "npm:7.6.0"
   checksum: 10/aa269069b90737ebc7bb171a43f31110b50f5eee04e854585c639f76bb55382966bc159f4e0a322497c44249568530d8af9b8dacde6677e8bb5c58339336f126
+  languageName: node
+  linkType: hard
+
+"@electron-forge/shared-types@npm:7.11.1":
+  version: 7.11.1
+  resolution: "@electron-forge/shared-types@npm:7.11.1"
+  dependencies:
+    "@electron-forge/tracer": "npm:7.11.1"
+    "@electron/packager": "npm:^18.3.5"
+    "@electron/rebuild": "npm:^3.7.0"
+    listr2: "npm:^7.0.2"
+  checksum: 10/21fe6215dc6c6ea091505211c0aaf6906269247a00d8e35908a6f5be66e5080f04db4f944a8f7475ad6643885c429cd90718a682e75723bae52b7bb96746725a
   languageName: node
   linkType: hard
 
@@ -512,6 +535,15 @@ __metadata:
     "@electron-forge/template-base": "npm:7.6.0"
     fs-extra: "npm:^10.0.0"
   checksum: 10/c7bfed793d44ddc0390b10171c61a4e2fb3492efd0d1d6044a0f9549e6ba31035c49748a2108058d344123ec67f55f8abfa5269b55985c5fa4c9c9f3d7a4710a
+  languageName: node
+  linkType: hard
+
+"@electron-forge/tracer@npm:7.11.1":
+  version: 7.11.1
+  resolution: "@electron-forge/tracer@npm:7.11.1"
+  dependencies:
+    chrome-trace-event: "npm:^1.0.3"
+  checksum: 10/bb09ac09da77d21308c2afa236c88ffa46a6e806b39b29af9142b0329c46585beccfd72bc1dd47d912ba17bb8a02b46ad8fdae1fba2acc6cc48e1d3ab08b697a
   languageName: node
   linkType: hard
 
@@ -10738,7 +10770,7 @@ __metadata:
   resolution: "opticode-ide@workspace:."
   dependencies:
     "@electron-forge/cli": "npm:^7.5.0"
-    "@electron-forge/maker-squirrel": "npm:^7.5.0"
+    "@electron-forge/maker-squirrel": "npm:^7.11.1"
     "@electron-forge/maker-zip": "npm:^7.4.0"
     "@electron-forge/plugin-base": "npm:^7.4.0"
     "@electron-forge/plugin-webpack": "npm:^7.4.0"
