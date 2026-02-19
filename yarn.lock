@@ -1370,6 +1370,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@opensumi/ide-core-common@npm:3.9.0":
+  version: 3.9.0
+  resolution: "@opensumi/ide-core-common@npm:3.9.0"
+  dependencies:
+    "@opensumi/di": "npm:^1.8.0"
+    "@opensumi/events": "npm:^1.0.0"
+    "@opensumi/ide-utils": "npm:3.9.0"
+    ai: "npm:^4.1.45"
+  checksum: 10/cf0b23482ca725566ad1b9234e4a23cb439f796e9c7a1b21b388902c2677a49ae55c7b0348fe446ac855fd3dab9fdd760f5a87e8fe5e230abb1849bcd46a2ecc
+  languageName: node
+  linkType: hard
+
 "@opensumi/ide-core-electron-main@npm:3.8.1-next-1741253659.0":
   version: 3.8.1-next-1741253659.0
   resolution: "@opensumi/ide-core-electron-main@npm:3.8.1-next-1741253659.0"
@@ -1708,12 +1720,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@opensumi/ide-output@npm:3.8.1-next-1741253659.0":
-  version: 3.8.1-next-1741253659.0
-  resolution: "@opensumi/ide-output@npm:3.8.1-next-1741253659.0"
+"@opensumi/ide-output@npm:3.9.0":
+  version: 3.9.0
+  resolution: "@opensumi/ide-output@npm:3.9.0"
   dependencies:
-    "@opensumi/ide-core-common": "npm:3.8.1-next-1741253659.0"
-  checksum: 10/8a126e6ecf056362774f4b29f7f3ec034e53c1c3c8aefd69d2ff93b1c10f0887c1400fb1c07ace522b8da7eac18f5506a9a1517266eff8c780097fa329126baf
+    "@opensumi/ide-core-common": "npm:3.9.0"
+  checksum: 10/e7d0357106233f3d9712bdea363c9d907dce5dee137af6c283a28e5e5b8363be2db24dd311c02274b1f38f0a7ee875d5b87703ffbc249e5add42dbede0b7b3df
   languageName: node
   linkType: hard
 
@@ -1884,6 +1896,19 @@ __metadata:
     nanoid: "npm:3.3.8"
     vscode-uri: "npm:3.0.2"
   checksum: 10/859f7f7e8128e0baf037b67d2fd10d41277000885fc3b0abd87726fd45671a525cc19cf7ffb06a8beecaa7ea96002401bcbd5c7219c751d32b9baec5b67b6679
+  languageName: node
+  linkType: hard
+
+"@opensumi/ide-utils@npm:3.9.0":
+  version: 3.9.0
+  resolution: "@opensumi/ide-utils@npm:3.9.0"
+  dependencies:
+    iconv-lite: "npm:^0.6.3"
+    jschardet: "npm:3.0.0"
+    mri: "npm:^1.2.0"
+    nanoid: "npm:3.3.8"
+    vscode-uri: "npm:3.0.2"
+  checksum: 10/174ac63a0491576bff7ad98aafd21add30a47b947db30a1fd3c8773d98ca4352ca294ec6fceb495ff64db22a2e6fa5b5c05f390c070eb212265dbd3fc02ed253
   languageName: node
   linkType: hard
 
@@ -10776,7 +10801,7 @@ __metadata:
     "@opensumi/ide-monaco-enhance": "npm:3.8.1-next-1741253659.0"
     "@opensumi/ide-opened-editor": "npm:3.8.1-next-1741253659.0"
     "@opensumi/ide-outline": "npm:3.8.1-next-1741253659.0"
-    "@opensumi/ide-output": "npm:3.8.1-next-1741253659.0"
+    "@opensumi/ide-output": "npm:3.9.0"
     "@opensumi/ide-overlay": "npm:3.8.1-next-1741253659.0"
     "@opensumi/ide-preferences": "npm:3.8.1-next-1741253659.0"
     "@opensumi/ide-process": "npm:3.8.1-next-1741253659.0"
