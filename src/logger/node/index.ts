@@ -1,7 +1,8 @@
 import { Injectable, Provider } from '@opensumi/di';
 import { NodeModule } from '@opensumi/ide-core-node';
-import { ILogServiceManager } from '@opensumi/ide-logs';
+import { ILogServiceManager, SupportLogNamespace } from '@opensumi/ide-logs';
 import { LogServiceManager } from './log-manager'
+import { ILogService } from '../common';
 
 @Injectable()
 export class LoggerModule extends NodeModule {
@@ -10,6 +11,10 @@ export class LoggerModule extends NodeModule {
       token: ILogServiceManager,
       useClass: LogServiceManager,
       override: true,
+    },
+    {
+      token: ILogService,
+      useFactory: (injector) => injector.get(ILogServiceManager).getLogger(SupportLogNamespace.Node),
     },
   ];
 }

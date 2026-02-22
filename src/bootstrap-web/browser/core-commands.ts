@@ -1,32 +1,44 @@
 import { Injectable, Autowired } from '@opensumi/di';
-import { CommandContribution, CommandRegistry, Domain, FILE_COMMANDS } from '@opensumi/ide-core-browser';
+import { ClientAppContribution, CommandContribution, CommandRegistry, Domain, FILE_COMMANDS, IWindowService } from '@opensumi/ide-core-browser';
 import { IWindowDialogService } from '@opensumi/ide-overlay';
-import { IWorkspaceService } from '@opensumi/ide-workspace';
+import { IDisposable } from '@opensumi/ide-core-common';
 
 @Injectable()
-@Domain(CommandContribution)
-export class CoreCommandContribution implements CommandContribution {
+@Domain(CommandContribution, ClientAppContribution)
+export class CoreCommandContribution implements CommandContribution, ClientAppContribution {
   @Autowired(IWindowDialogService)
   private window: IWindowDialogService;
 
-  @Autowired(IWorkspaceService)
-  private workspace: IWorkspaceService;
-  
+  @Autowired(IWindowService)
+  private windowService: IWindowService;
+
+  @Autowired(CommandRegistry)
+  private commandRegistry: CommandRegistry;
+
+  private openFolderHandler?: IDisposable;
+
   registerCommands(commands: CommandRegistry) {
-    commands.registerCommand(FILE_COMMANDS.OPEN_FOLDER, {
-      execute: async () => {
+    this.registerOpenFolderHandler(commands);
+  }
+
+  onStart() {
+    this.registerOpenFolderHandler(this.commandRegistry);
+  }
+
+  private registerOpenFolderHandler(commands: CommandRegistry) {
+    if (this.openFolderHandler) {
+      this.openFolderHandler.dispose();
+    }
+    this.openFolderHandler = commands.registerHandler(FILE_COMMANDS.OPEN_FOLDER.id, {
+      execute: async (options?: { newWindow?: boolean }) => {
         const newWorkspace = await this.window.showOpenDialog({
           canSelectFolders: true,
           canSelectMany: false,
         });
-        if (newWorkspace) {
-          if (this.workspace.workspace?.uri.toString() === newWorkspace[0].toString()) {
-            return;
-          }
-          window.open(`${window.location.protocol}//${window.location.host}?workspaceDir=${newWorkspace[0].codeUri.fsPath.toString()}`);
+        if (newWorkspace && newWorkspace.length > 0) {
+          this.windowService.openWorkspace(newWorkspace[0], { newWindow: options?.newWindow ?? false });
         }
-      }
-    })
+      },
+    });
   }
-
 }

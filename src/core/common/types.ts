@@ -43,6 +43,12 @@ export interface IAppMenuService {
   renderRecentWorkspaces(workspaces: string[]): Promise<void>;
 }
 
+export const IAppWindowService = 'IAppWindowService';
+
+export interface IAppWindowService {
+  openNewWindow(): void;
+}
+
 export const IProduct = Symbol('IProduct');
 export interface IProduct {
   productName: string;

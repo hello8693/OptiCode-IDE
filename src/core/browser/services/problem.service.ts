@@ -138,8 +138,29 @@ export class ProblemService implements IProblemService {
     };
   }
 
-  private readCppTemplate(): string {
-    return this.storage.getItem<string>(CPP_TEMPLATE_STORAGE_KEY, CPP_TEMPLATE) || CPP_TEMPLATE;
+  private templateFilePath(root: string): string {
+    return `${root}/.opticode/templates/default.cpp`;
+  }
+
+  private async readCppTemplate(): Promise<string> {
+    const root = await this.rootPath();
+    if (root) {
+      const templatePath = this.templateFilePath(root);
+      const templateUri = this.toUri(templatePath);
+      try {
+        const stat = await this.fileService.getFileStat(templateUri);
+        if (stat) {
+          const { content } = await this.fileService.readFile(templateUri);
+          const text = content.toString();
+          if (text.trim().length > 0) return text;
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    const stored = await Promise.resolve(this.storage.getItem<string>(CPP_TEMPLATE_STORAGE_KEY, CPP_TEMPLATE));
+    return stored || CPP_TEMPLATE;
   }
 
   private toUri(fsPath: string): string {
@@ -167,7 +188,7 @@ export class ProblemService implements IProblemService {
     const srcUri = this.toUri(paths.sourcePath);
     const srcStat = await this.fileService.getFileStat(srcUri);
     if (!srcStat) {
-      const template = this.readCppTemplate();
+      const template = await this.readCppTemplate();
       await this.fileService.createFile(srcUri, { content: template });
     }
 
@@ -237,6 +258,37 @@ export class ProblemService implements IProblemService {
     } catch {
       return [];
     }
+  }
+
+  /**
+   * 判断当前工作区是否符合 OptiCode 题目结构。
+   */
+  async isOptiCodeWorkspace(): Promise<boolean> {
+    const root = await this.rootPath();
+    if (!root) return false;
+
+    // .opticode 目录存在即视为已初始化
+    if (await this.fileExists(`${root}/.opticode`)) return true;
+
+    const rootUri = this.toUri(root);
+    try {
+      const stat = await this.fileService.getFileStat(rootUri, true);
+      if (!stat?.children) return false;
+
+      for (const child of stat.children) {
+        if (!child.isDirectory) continue;
+        const name = new URI(child.uri).displayName;
+        if (!name || name.startsWith('.') || name === 'node_modules') continue;
+        const dirFs = new URI(child.uri).codeUri.fsPath;
+        const hasMeta = await this.fileExists(`${dirFs}/meta.json`);
+        const hasCpp = await this.fileExists(`${dirFs}/${name}.cpp`);
+        if (hasMeta || hasCpp) return true;
+      }
+    } catch {
+      return false;
+    }
+
+    return false;
   }
 
   /* ────────── 删除题目 ────────── */

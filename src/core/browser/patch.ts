@@ -25,6 +25,24 @@ export class PatchContribution implements MenuContribution, ClientAppContributio
         content: formatLocalize('welcome-view.noFolderHelp', `${FILE_COMMANDS.OPEN_FOLDER.id}?{"newWindow":false}`)
       })
     }
+
+    if (electronEnv.isElectronRenderer && electronEnv.monacoWorkerPath) {
+      const workerUrl = URI.file(electronEnv.monacoWorkerPath).toString();
+      const monacoEnv = (window as any).MonacoEnvironment || {};
+      (window as any).MonacoEnvironment = {
+        ...monacoEnv,
+        getWorker: (moduleId: string, label: string) => {
+          try {
+            return new Worker(workerUrl, { type: 'classic', name: label });
+          } catch (error) {
+            if (typeof monacoEnv.getWorker === 'function') {
+              return monacoEnv.getWorker(moduleId, label);
+            }
+            throw error;
+          }
+        },
+      };
+    }
   }
 
   registerMenus(menuRegistry: IMenuRegistry) {
@@ -40,6 +58,9 @@ export class PatchContribution implements MenuContribution, ClientAppContributio
     service.registerStaticResourceProvider({
       scheme: Schemes.monaco,
       resolveStaticResource: (uri) => {
+        if (!electronEnv.isElectronRenderer || !electronEnv.monacoWorkerPath) {
+          return uri;
+        }
         const path = uri.codeUri.path;
 
         switch (path) {

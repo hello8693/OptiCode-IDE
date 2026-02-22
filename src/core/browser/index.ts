@@ -1,4 +1,4 @@
-import { BrowserModule, createElectronMainApi, IElectronNativeDialogService } from '@opensumi/ide-core-browser';
+import { BrowserModule, createElectronMainApi, IElectronNativeDialogService, electronEnv } from '@opensumi/ide-core-browser';
 import { Injectable } from '@opensumi/di';
 import { ElectronBasicContribution } from '@opensumi/ide-electron-basic/lib/browser'
 import { ElectronNativeDialogService } from '@opensumi/ide-electron-basic/lib/browser/dialog'
@@ -10,7 +10,7 @@ import { ProjectSwitcherContribution } from './project.contribution';
 import { LocalMenuContribution } from './menu.contribution';
 import { LocalThemeContribution } from './theme.contribution';
 import { patchProviders } from './patch'
-import { IStorageService, IAppMenuService, IThemeService, ISampleDataService, IProblemService, IJudgeService, IProblemAssetService } from '../common';
+import { IStorageService, IAppMenuService, IAppWindowService, IThemeService, ISampleDataService, IProblemService, IJudgeService, IProblemAssetService, SystemPathServicePath } from '../common';
 import { HeaderContribution, ELECTRON_HEADER } from './header/header.contribution'
 import { WelcomeContribution } from './welcome/welcome.contribution'
 import { CppStatusContribution } from './cpp/status.contribution'
@@ -22,32 +22,82 @@ import { ProblemAssetService } from './services/problem-asset.service'
 import { CppPreferenceContribution } from './cpp/preference.contribution'
 import { JudgeService } from './services/judge.service'
 import { ClangdConfigService } from './services/clangd-config.service'
+import { CompetitiveCompanionWorkspaceTracker } from './competitive-companion/workspace-tracker.contribution'
+import { ScratchpadContribution } from './scratchpad/contribution'
+import { ScratchpadAutoSaveContribution } from './scratchpad/autosave.contribution'
+import { ScratchpadService } from './scratchpad/scratchpad.service'
+import { ScratchpadDocumentProvider } from './scratchpad/document-provider'
+import { WebStorageService } from './services/web-storage.service';
+import { WebAppMenuService, WebAppWindowService, WebThemeService } from './services/web-noop.service';
 
 export { ELECTRON_HEADER }
+
+const isElectronRuntime =
+  electronEnv.isElectronRenderer === true && typeof (globalThis as any).ElectronIpcRenderer !== 'undefined';
 
 @Injectable()
 export class CoreBrowserModule extends BrowserModule {
   providers = [
-    {
-      token: IElectronNativeDialogService,
-      useClass: ElectronNativeDialogService,
-    },
-    {
-      token: IElectronHeaderService,
-      useClass: ElectronHeaderService,
-    },
-    ElectronBasicContribution,
-    ElectronPreferenceContribution,
+    ...(isElectronRuntime ? [
+      {
+        token: IElectronNativeDialogService,
+        useClass: ElectronNativeDialogService,
+      },
+      {
+        token: IElectronHeaderService,
+        useClass: ElectronHeaderService,
+      },
+      ElectronBasicContribution,
+      ElectronPreferenceContribution,
+      HeaderContribution,
+      ProjectSwitcherContribution,
+      LocalMenuContribution,
+      LocalThemeContribution,
+      {
+        token: IStorageService,
+        useValue: createElectronMainApi(IStorageService),
+      },
+      {
+        token: IThemeService,
+        useValue: createElectronMainApi(IThemeService),
+      },
+      {
+        token: IAppMenuService,
+        useValue: createElectronMainApi(IAppMenuService),
+      },
+      {
+        token: IAppWindowService,
+        useValue: createElectronMainApi(IAppWindowService),
+      },
+    ] : [
+      {
+        token: IStorageService,
+        useClass: WebStorageService,
+      },
+      {
+        token: IThemeService,
+        useClass: WebThemeService,
+      },
+      {
+        token: IAppMenuService,
+        useClass: WebAppMenuService,
+      },
+      {
+        token: IAppWindowService,
+        useClass: WebAppWindowService,
+      },
+    ]),
     WelcomeContribution,
-    HeaderContribution,
-    ProjectSwitcherContribution,
-    LocalMenuContribution,
-    LocalThemeContribution,
     CppPreferenceContribution,
     CppStatusContribution,
     CompileRunContribution,
     ProblemListContribution,
+    ScratchpadContribution,
+    ScratchpadAutoSaveContribution,
+    ScratchpadService,
+    ScratchpadDocumentProvider,
     ClangdConfigService,
+    CompetitiveCompanionWorkspaceTracker,
     {
       token: IJudgeService,
       useClass: JudgeService,
@@ -64,18 +114,12 @@ export class CoreBrowserModule extends BrowserModule {
       token: IProblemAssetService,
       useClass: ProblemAssetService,
     },
-    {
-      token: IStorageService,
-      useValue: createElectronMainApi(IStorageService),
-    },
-    {
-      token: IThemeService,
-      useValue: createElectronMainApi(IThemeService),
-    },
-    {
-      token: IAppMenuService,
-      useValue: createElectronMainApi(IAppMenuService),
-    },
     ...patchProviders,
+  ];
+
+  backServices = [
+    {
+      servicePath: SystemPathServicePath,
+    },
   ];
 }

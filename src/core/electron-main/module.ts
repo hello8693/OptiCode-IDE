@@ -6,6 +6,8 @@ import { LifecycleContribution } from './lifecycle.contribution'
 import { IProduct, IEnvironmentService } from '../common'
 import { EnvironmentService } from './environment.service'
 import { WindowsManager } from './window/windows-manager'
+import { AppWindowContribution } from './window/app-window.contribution'
+import { AppWindowService } from './window/app-window.service'
 import { AppMenuContribution, AppMenuService } from './menu.contribution'
 import { WindowContribution } from './window/window.contribution'
 import { WorkspaceHistoryContribution } from './workspace/workspace-history.contribution'
@@ -22,6 +24,8 @@ export class CoreElectronMainModule extends ElectronMainModule {
     ThemeService,
     AppMenuContribution,
     AppMenuService,
+    AppWindowContribution,
+    AppWindowService,
     WindowContribution,
     WindowsManager,
     WorkspaceHistoryContribution,

@@ -10,8 +10,10 @@ export const layoutConfig = {
   [SlotLocation.left]: {
     modules: [
       '@opensumi/ide-explorer',
-      'singlefile-container',
+      'problem-list-container',
+      'scratchpad-container',
       'sample-test-container',
+      'compile-run-container',
       '@opensumi/ide-extension-manager',
       '@opensumi/ide-debug',
     ],

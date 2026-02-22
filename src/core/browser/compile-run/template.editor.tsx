@@ -11,19 +11,26 @@ export const CppTemplateEditor: ReactEditorComponent = () => {
   const [savedAt, setSavedAt] = useState<string>('');
 
   useEffect(() => {
-    const current = storage.getItem<string>(CPP_TEMPLATE_STORAGE_KEY, DEFAULT_CPP_TEMPLATE);
-    setValue(current || DEFAULT_CPP_TEMPLATE);
+    let disposed = false;
+    (async () => {
+      const current = await Promise.resolve(
+        storage.getItem<string>(CPP_TEMPLATE_STORAGE_KEY, DEFAULT_CPP_TEMPLATE),
+      );
+      if (disposed) return;
+      setValue(current || DEFAULT_CPP_TEMPLATE);
+    })();
+    return () => { disposed = true; };
   }, [storage]);
 
-  const save = () => {
+  const save = async () => {
     const trimmed = value.length ? value : DEFAULT_CPP_TEMPLATE;
-    storage.setItem(CPP_TEMPLATE_STORAGE_KEY, trimmed);
+    await Promise.resolve(storage.setItem(CPP_TEMPLATE_STORAGE_KEY, trimmed));
     setSavedAt(new Date().toLocaleTimeString());
   };
 
-  const reset = () => {
+  const reset = async () => {
     setValue(DEFAULT_CPP_TEMPLATE);
-    storage.setItem(CPP_TEMPLATE_STORAGE_KEY, DEFAULT_CPP_TEMPLATE);
+    await Promise.resolve(storage.setItem(CPP_TEMPLATE_STORAGE_KEY, DEFAULT_CPP_TEMPLATE));
     setSavedAt(new Date().toLocaleTimeString());
   };
 

@@ -1,29 +1,5 @@
-<h1 align="center">OptiCode IDE</h1>
-
-<p align="center">AI Native IDE.</p>
-
-![0F2230D7-7623-4141-91BE-487973ED0AF7](https://github.com/user-attachments/assets/8b6c71c2-7242-4894-9c73-996365b4245a)
-
-
-[![Discussions][discussions-image]][discussions-url] [![Open in CodeBlitz][codeblitz-image]][codeblitz-url]
-
-[discussions-image]: https://img.shields.io/badge/discussions-on%20github-blue
-[discussions-url]: https://github.com/opticode-ai/opticode-ide/discussions
-[codeblitz-image]: https://img.shields.io/badge/Ant_Codespaces-Open_in_CodeBlitz-1677ff
-[codeblitz-url]: https://codeblitz.cloud.alipay.com/github/opticode-ai/opticode-ide
-[github-issues-url]: https://github.com/opticode-ai/opticode-ide/issues
-[help-wanted-image]: https://flat.badgen.net/github/label-issues/opticode-ai/opticode-ide/🤔%20help%20wanted/open
-[help-wanted-url]: https://github.com/opticode-ai/opticode-ide/issues?q=is%3Aopen+is%3Aissue+label%3A%22🤔+help+wanted%22
-
-## ✨ Features
-- **AI-Native Development Environment**: Enjoy an integrated development environment that leverages AI technologies to enhance productivity and streamline workflows.
-- **Open Model Integration**: Our platform supports the seamless integration of various models, allowing developers to customize and extend functionality according to their needs.
-- **VS Code Extension Compatibility**: Benefit from a rich ecosystem of plugins by ensuring compatibility with VS Code extensions, enabling you to leverage existing tools and resources.
-- **Complete Solution**: Uses electron-forge to package desktop applications and supports development, building, packaging, and auto updates.
-
-## Getting started
-
-See https://github.com/opticode-ai/opticode-ide/releases
+# OptiCode IDE
+一款适用于算法竞赛的代码编辑器。
 
 ## Contributing
 
@@ -55,6 +31,3 @@ yarn run build-web
 yarn run start-web
 ```
 
-## Links
-
-- **OptiCode IDE**: https://opticode.ai

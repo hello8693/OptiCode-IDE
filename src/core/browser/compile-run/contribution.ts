@@ -28,9 +28,14 @@ import { IMessageService } from '@opensumi/ide-overlay';
 import { ITerminalApiService, ITerminalController } from '@opensumi/ide-terminal-next';
 import { DebugConfiguration, DebugState, IDebugSessionManager } from '@opensumi/ide-debug';
 import { DebugConfigurationManager } from '@opensumi/ide-debug/lib/browser/debug-configuration-manager';
+import { IEditorDocumentModelService } from '@opensumi/ide-editor/lib/browser';
 
 import { STD_KEY, STD_OPTIONS, STD_DEFAULT, OPT_KEY, OPT_OPTIONS, CPP_PREFERENCE_IDS } from '../cpp/constants';
-import { IStorageService } from '../../common';
+import { CPP_TEMPLATE_STORAGE_KEY, DEFAULT_CPP_TEMPLATE } from '../../common/templates';
+import { SCRATCHPAD_SCHEME, ScratchpadEntry } from '../../common/scratchpad';
+import { ScratchpadService } from '../scratchpad/scratchpad.service';
+import { CompetitiveCompanionSettingsEditor } from '../competitive-companion/settings.editor';
+import { IStorageService, ISystemPathService, SystemPathServicePath } from '../../common';
 import { IProblem, IProblemService } from '../../common/problem';
 import { CompileRunPanel, COMPILE_RUN_PANEL } from './view';
 import { SampleTestPanel, SAMPLE_TEST_PANEL, SAMPLE_TEST_CONTAINER } from '../sample-test/view';
@@ -59,11 +64,14 @@ export const SINGLEFILE_DEBUG_CMD = 'singlefile.cpp.debug';
 export const SINGLEFILE_OPEN_SETTINGS_CMD = 'singlefile.cpp.openSettings';
 export const SINGLEFILE_OPEN_TEMPLATE_CMD = 'singlefile.cpp.openTemplate';
 export const SINGLEFILE_OPEN_META_CMD = 'singlefile.cpp.openMeta';
+export const OPEN_COMPETITIVE_COMPANION_SETTINGS_CMD = 'competitiveCompanion.openSettings';
 export const COMPILE_RUN_CONTAINER = 'compile-run-container';
 export const CPP_SETTINGS_SCHEME = 'cpp-settings';
 export const CPP_SETTINGS_URI = `${CPP_SETTINGS_SCHEME}://panel`;
 export const CPP_TEMPLATE_SCHEME = 'cpp-template';
 export const CPP_TEMPLATE_URI = `${CPP_TEMPLATE_SCHEME}://panel`;
+export const COMPETITIVE_COMPANION_SETTINGS_SCHEME = 'competitive-companion-settings';
+export const COMPETITIVE_COMPANION_SETTINGS_URI = `${COMPETITIVE_COMPANION_SETTINGS_SCHEME}://panel`;
 export const PROBLEM_META_SCHEME = 'problem-meta';
 
 function stdToFlag(std: string): string {
@@ -71,8 +79,19 @@ function stdToFlag(std: string): string {
     case 'C++14': return '-std=c++14';
     case 'C++17': return '-std=c++17';
     case 'C++23': return '-std=c++23';
-    default: return '-std=c++20';
+    default: return '-std=c++14';
   }
+}
+
+interface ScratchpadContext {
+  id: string;
+  entry: ScratchpadEntry;
+  uri: URI;
+  content: string;
+  workDir: string;
+  sourcePath: string;
+  execPath: string;
+  contentHash: string;
 }
 
 @Domain(CommandContribution, ClientAppContribution, ComponentContribution, BrowserEditorContribution)
@@ -101,6 +120,9 @@ export class CompileRunContribution
   @Autowired(IStorageService)
   private readonly storage: IStorageService;
 
+  @Autowired(SystemPathServicePath)
+  private readonly systemPathService: ISystemPathService;
+
   @Autowired(IQuickInputService)
   private readonly quickInput: IQuickInputService;
 
@@ -116,10 +138,24 @@ export class CompileRunContribution
   @Autowired(IDebugSessionManager)
   private readonly debugSessionManager: IDebugSessionManager;
 
+  @Autowired(IEditorDocumentModelService)
+  private readonly docModelService: IEditorDocumentModelService;
+
+  @Autowired(ScratchpadService)
+  private readonly scratchService: ScratchpadService;
+
   private cachedCompiler: string | undefined;
+  private scratchBuildCache = new Map<string, { execPath: string; cwd: string; contentHash: string }>();
+  private cachedPlatform: string | undefined;
 
   private async pickBrewGpp(): Promise<string | undefined> {
-    const dirs = ['/opt/homebrew/bin', '/usr/local/bin'];
+    const dirs = [
+      '/opt/homebrew/bin',
+      '/opt/homebrew/opt/gcc/bin',
+      '/usr/local/bin',
+      '/usr/local/opt/gcc/bin',
+      '/opt/local/bin',
+    ];
     for (const dir of dirs) {
       try {
         const stat = await this.fileService.getFileStat(new URI(`file://${dir}`).toString(), true);
@@ -148,7 +184,8 @@ export class CompileRunContribution
       return custom;
     }
 
-    if (process.platform === 'darwin') {
+    const platform = await this.getPlatform();
+    if (platform === 'darwin') {
       const brewGpp = await this.pickBrewGpp();
       if (brewGpp) {
         this.cachedCompiler = brewGpp;
@@ -201,6 +238,13 @@ export class CompileRunContribution
     });
 
     registry.registerEditorComponent({
+      uid: 'competitive-companion-settings',
+      scheme: COMPETITIVE_COMPANION_SETTINGS_SCHEME,
+      component: CompetitiveCompanionSettingsEditor,
+      renderMode: EditorComponentRenderMode.ONE_PER_WORKBENCH,
+    });
+
+    registry.registerEditorComponent({
       uid: 'problem-meta-editor',
       scheme: PROBLEM_META_SCHEME,
       component: ProblemMetaEditor,
@@ -213,6 +257,10 @@ export class CompileRunContribution
 
     registry.registerEditorComponentResolver(CPP_TEMPLATE_SCHEME, (resource, results) => {
       results.push({ type: EditorOpenType.component, componentId: 'cpp-template-editor' });
+    });
+
+    registry.registerEditorComponentResolver(COMPETITIVE_COMPANION_SETTINGS_SCHEME, (resource, results) => {
+      results.push({ type: EditorOpenType.component, componentId: 'competitive-companion-settings' });
     });
 
     registry.registerEditorComponentResolver('file', (resource, results) => {
@@ -244,6 +292,15 @@ export class CompileRunContribution
         uri,
         name: localize('cpp.template.title', '默认源码模板'),
         icon: getIcon('edit'),
+      }),
+    });
+
+    service.registerResourceProvider({
+      scheme: COMPETITIVE_COMPANION_SETTINGS_SCHEME,
+      provideResource: async (uri: URI): Promise<IResource> => ({
+        uri,
+        name: localize('competitive.companion.settings.title', 'Competitive Companion 设置'),
+        icon: getIcon('setting'),
       }),
     });
 
@@ -289,6 +346,10 @@ export class CompileRunContribution
     registry.registerCommand(
       { id: SINGLEFILE_OPEN_TEMPLATE_CMD, label: '打开源码模板' },
       { execute: () => this.openCppTemplate() },
+    );
+    registry.registerCommand(
+      { id: OPEN_COMPETITIVE_COMPANION_SETTINGS_CMD, label: 'Competitive Companion 设置' },
+      { execute: () => this.openCompetitiveCompanionSettings() },
     );
     registry.registerCommand(
       { id: SINGLEFILE_OPEN_META_CMD, label: '编辑题目信息' },
@@ -345,7 +406,48 @@ export class CompileRunContribution
   }
 
   private async openCppTemplate(): Promise<void> {
-    await this.editorService.open(new URI(CPP_TEMPLATE_URI), { preview: false });
+    const root = await this.getRootPath();
+    if (!root) {
+      this.messageService.warning('请先打开一个文件夹以编辑源码模板');
+      return;
+    }
+
+    const templateDir = `${root}/.opticode/templates`;
+    const templatePath = `${templateDir}/default.cpp`;
+    const templateDirUri = new URI(`file://${templateDir}`).toString();
+    const templateFileUri = new URI(`file://${templatePath}`).toString();
+
+    try {
+      const stat = await this.fileService.getFileStat(templateDirUri);
+      if (!stat) {
+        await this.fileService.createFolder(templateDirUri);
+      }
+    } catch {
+      await this.fileService.createFolder(templateDirUri);
+    }
+
+    try {
+      const stat = await this.fileService.getFileStat(templateFileUri);
+      if (!stat) {
+        const current = await Promise.resolve(
+          this.storage.getItem<string>(CPP_TEMPLATE_STORAGE_KEY, DEFAULT_CPP_TEMPLATE),
+        );
+        const content = current || DEFAULT_CPP_TEMPLATE;
+        await this.fileService.createFile(templateFileUri, { content });
+      }
+    } catch {
+      const current = await Promise.resolve(
+        this.storage.getItem<string>(CPP_TEMPLATE_STORAGE_KEY, DEFAULT_CPP_TEMPLATE),
+      );
+      const content = current || DEFAULT_CPP_TEMPLATE;
+      await this.fileService.createFile(templateFileUri, { content });
+    }
+
+    await this.editorService.open(URI.file(templatePath), { preview: false });
+  }
+
+  private async openCompetitiveCompanionSettings(): Promise<void> {
+    await this.editorService.open(new URI(COMPETITIVE_COMPANION_SETTINGS_URI), { preview: false });
   }
 
   private async getStd(): Promise<string> {
@@ -379,6 +481,60 @@ export class CompileRunContribution
     return roots[0].uri;
   }
 
+  private async getScratchpadPaths(id: string): Promise<{ workDir: string; sourcePath: string; execPath: string }> {
+    return this.systemPathService.getScratchpadBuildPaths(id);
+  }
+
+  private hashScratchContent(content: string): string {
+    let hash = 0;
+    for (let i = 0; i < content.length; i += 1) {
+      hash = ((hash << 5) - hash) + content.charCodeAt(i);
+      hash |= 0;
+    }
+    return `${content.length}:${hash}`;
+  }
+
+  private async getActiveScratchpadContext(): Promise<ScratchpadContext | undefined> {
+    const resource = this.editorService.currentResource;
+    if (!resource) return undefined;
+    const uri = resource.uri;
+    if (!uri || uri.scheme !== SCRATCHPAD_SCHEME) return undefined;
+    const id = this.scratchService.getIdFromUri(uri);
+    if (!id) return undefined;
+
+    const entry = await this.scratchService.ensure(id);
+    const { workDir, sourcePath, execPath } = await this.getScratchpadPaths(id);
+    const backingUri = await this.scratchService.getBackingUri(id);
+
+    let ref;
+    try {
+      ref = await this.docModelService.createModelReference(backingUri, 'scratchpad-compile');
+      const content = ref.instance.getText();
+      return {
+        id,
+        entry,
+        uri,
+        content,
+        workDir,
+        sourcePath,
+        execPath,
+        contentHash: this.hashScratchContent(content),
+      };
+    } catch (err: any) {
+      this.messageService.error(`读取草稿纸失败：${err?.message || err}`);
+      return undefined;
+    } finally {
+      ref?.dispose();
+    }
+  }
+
+  private async getPlatform(): Promise<string> {
+    if (!this.cachedPlatform) {
+      this.cachedPlatform = await this.systemPathService.getPlatform();
+    }
+    return this.cachedPlatform;
+  }
+
   private isSamplesJsonPath(fsPath: string): boolean {
     if (!fsPath) return false;
     const normalized = fsPath.replace(/\\/g, '/');
@@ -394,6 +550,18 @@ export class CompileRunContribution
       }
     } catch {
       try { await this.fileService.createFolder(binUri); } catch { /* ignore */ }
+    }
+  }
+
+  /** 确保草稿纸临时目录存在 */
+  private async ensureScratchDir(dirUri: string) {
+    try {
+      const stat = await this.fileService.getFileStat(dirUri);
+      if (!stat) {
+        await this.fileService.createFolder(dirUri);
+      }
+    } catch {
+      try { await this.fileService.createFolder(dirUri); } catch { /* ignore */ }
     }
   }
 
@@ -414,7 +582,10 @@ export class CompileRunContribution
   ): Promise<{ exitCode?: number; clientId: string }> {
     this.terminalController.showTerminalPanel();
 
-    const shell = process.env.SHELL || '/bin/bash';
+    const shell =
+      (typeof process !== 'undefined' && process.env && process.env.SHELL)
+        ? process.env.SHELL
+        : '/bin/bash';
     const cmdLine = [executable, ...args]
       .filter(Boolean)
       .map((part) => (part.includes(' ') ? `"${part}"` : part))
@@ -512,9 +683,15 @@ export class CompileRunContribution
   }
 
   async compileCurrentFile(): Promise<boolean> {
+    const scratch = await this.getActiveScratchpadContext();
+    if (scratch) {
+      const res = await this.compileScratchpad(scratch);
+      return res.ok;
+    }
+
     const problem = (this.problemService as any).activeProblem as IProblem | undefined;
     if (!problem) {
-      this.messageService.warning('请先打开一个题目的 .cpp 文件');
+      this.messageService.warning('请先打开一个题目的 .cpp 文件或草稿纸');
       return false;
     }
 
@@ -522,9 +699,15 @@ export class CompileRunContribution
   }
 
   async runCompiledFile() {
+    const scratch = await this.getActiveScratchpadContext();
+    if (scratch) {
+      await this.runScratchpad(scratch);
+      return;
+    }
+
     const problem = (this.problemService as any).activeProblem as IProblem | undefined;
     if (!problem) {
-      this.messageService.warning('请先打开一个题目的 .cpp 文件');
+      this.messageService.warning('请先打开一个题目的 .cpp 文件或草稿纸');
       return;
     }
 
@@ -536,9 +719,21 @@ export class CompileRunContribution
   }
 
   async compileAndRun() {
+    const scratch = await this.getActiveScratchpadContext();
+    if (scratch) {
+      const compileRes = await this.compileScratchpad(scratch);
+      if (!compileRes.ok) {
+        const exitCodeText = compileRes.exitCode ?? '未知';
+        this.messageService.error(`编译失败(退出码 ${exitCodeText})，已停止运行，请查看终端输出。`);
+        return;
+      }
+      await this.runScratchpad(scratch, { skipCompileCheck: true });
+      return;
+    }
+
     const problem = (this.problemService as any).activeProblem as IProblem | undefined;
     if (!problem) {
-      this.messageService.warning('请先打开一个题目的 .cpp 文件');
+      this.messageService.warning('请先打开一个题目的 .cpp 文件或草稿纸');
       return;
     }
 
@@ -631,9 +826,15 @@ export class CompileRunContribution
   }
 
   async debugCurrentFile() {
+    const scratch = await this.getActiveScratchpadContext();
+    if (scratch) {
+      this.messageService.info('草稿纸暂不支持调试');
+      return;
+    }
+
     const problem = (this.problemService as any).activeProblem as IProblem | undefined;
     if (!problem) {
-      this.messageService.warning('请先打开一个题目的 .cpp 文件');
+      this.messageService.warning('请先打开一个题目的 .cpp 文件或草稿纸');
       return;
     }
 
@@ -656,5 +857,72 @@ export class CompileRunContribution
       workspaceFolderUri,
       index: -1,
     });
+  }
+
+  private async compileScratchpad(context?: ScratchpadContext): Promise<{ ok: boolean; exitCode?: number }> {
+    const ctx = context || await this.getActiveScratchpadContext();
+    if (!ctx) {
+      this.messageService.warning('请先打开草稿纸');
+      return { ok: false };
+    }
+
+    const stdFlag = stdToFlag(await this.getStd());
+    const flags = await this.getFlags();
+    const gpp = await this.getCompiler();
+
+    const dirUri = URI.file(ctx.workDir).toString();
+    await this.ensureScratchDir(dirUri);
+
+    const sourceUri = URI.file(ctx.sourcePath).toString();
+    await this.fileService.createFile(sourceUri, { content: ctx.content, overwrite: true });
+
+    const args = [stdFlag, ...flags, '-o', ctx.execPath, ctx.sourcePath];
+    const res = await this.spawnTerminalCommand(`编译 草稿纸`, gpp, args, {
+      cwd: ctx.workDir,
+      waitForExit: true,
+      pauseOnExit: 'onFailure',
+      removeOnSuccess: false,
+    });
+
+    const ok = res.exitCode === 0 || res.exitCode === undefined;
+    if (ok) {
+      this.scratchBuildCache.set(ctx.id, {
+        execPath: ctx.execPath,
+        cwd: ctx.workDir,
+        contentHash: ctx.contentHash,
+      });
+    }
+    return { ok, exitCode: res.exitCode };
+  }
+
+  private async runScratchpad(
+    context?: ScratchpadContext,
+    options?: { skipCompileCheck?: boolean },
+  ): Promise<void> {
+    const ctx = context || await this.getActiveScratchpadContext();
+    if (!ctx) {
+      this.messageService.warning('请先打开草稿纸');
+      return;
+    }
+
+    const cached = this.scratchBuildCache.get(ctx.id);
+    const cacheValid = cached && cached.contentHash === ctx.contentHash;
+    if (!cacheValid && !options?.skipCompileCheck) {
+      const compileRes = await this.compileScratchpad(ctx);
+      if (!compileRes.ok) {
+        const exitCodeText = compileRes.exitCode ?? '未知';
+        this.messageService.error(`编译失败(退出码 ${exitCodeText})，已停止运行，请查看终端输出。`);
+        return;
+      }
+    }
+
+    const execPath = this.scratchBuildCache.get(ctx.id)?.execPath || ctx.execPath;
+    const cwd = this.scratchBuildCache.get(ctx.id)?.cwd || ctx.workDir;
+    await this.spawnTerminalCommand(`运行 草稿纸`, execPath, [], {
+      cwd,
+      waitForExit: false,
+      pauseOnExit: true,
+    });
+    await this.scratchService.updateRunInfo(ctx.id);
   }
 }

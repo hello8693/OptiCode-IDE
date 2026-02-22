@@ -1,0 +1,157 @@
+@import './oi-panel.less';
+
+.oi-scratchpad-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 6px;
+  flex: 0 0 auto;
+  background-color: currentColor;
+  -webkit-mask-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M16.4142%2022H2V2H22V16.4142L16.4142%2022ZM15.5%2015.5V20L20%2015.5H15.5ZM18%2010V8H6V10H18ZM11%2014V12H6V14H11Z%22%2F%3E%3C%2Fsvg%3E");
+  mask-image: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22M16.4142%2022H2V2H22V16.4142L16.4142%2022ZM15.5%2015.5V20L20%2015.5H15.5ZM18%2010V8H6V10H18ZM11%2014V12H6V14H11Z%22%2F%3E%3C%2Fsvg%3E");
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+
+.activity-icon.oi-scratchpad-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 0;
+}
+
+.scratchpad-panel {
+  height: 100%;
+}
+
+.scratchpad-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.scratchpad-search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  border: 1px solid var(--kt-input-border, #3c3c3c);
+  background: var(--kt-input-background, var(--editor-background));
+  margin-bottom: 8px;
+}
+
+.scratchpad-search-input {
+  background: transparent;
+  border: none;
+  color: var(--kt-input-foreground, var(--foreground));
+  font-size: 12px;
+  width: 100%;
+}
+
+.scratchpad-search-input:focus {
+  outline: none;
+}
+
+.scratchpad-list {
+  flex: 1;
+}
+
+.scratchpad-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--kt-panel-border, #2b2b2b);
+  cursor: pointer;
+}
+
+.scratchpad-item:hover {
+  background-color: var(--kt-list-hoverBackground, #2a2d2e);
+}
+
+.scratchpad-item__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.scratchpad-item__name {
+  font-weight: 600;
+  font-size: 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.scratchpad-item__time {
+  font-size: 11px;
+  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+}
+
+.scratchpad-item__actions {
+  display: flex;
+  gap: 4px;
+}
+
+.scratchpad-empty {
+  padding: 24px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0.8;
+}
+
+.scratchpad-editor {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--kt-editor-background, var(--editor-background));
+}
+
+.scratchpad-editor__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--kt-panel-border, #2b2b2b);
+  background: var(--kt-editorWidget-background, var(--panel-background));
+}
+
+.scratchpad-editor__title {
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+}
+
+.scratchpad-editor__name {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.scratchpad-editor__meta {
+  font-size: 11px;
+  opacity: 0.6;
+  display: inline-flex;
+  align-items: center;
+}
+
+.scratchpad-editor__body {
+  flex: 1;
+  min-height: 0;
+}
+
+.scratchpad-editor__code {
+  height: 100%;
+}

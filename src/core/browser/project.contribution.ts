@@ -66,10 +66,13 @@ export class ProjectSwitcherContribution
   }
 
   onDidRestoreState() {
-    if (electronEnv.metadata.launchToOpenFile) {
-      this.editorService.open(URI.file(electronEnv.metadata.launchToOpenFile));
+    if (!electronEnv.isElectronRenderer || !electronEnv.ipcRenderer) return;
+    const launchToOpenFile = electronEnv.metadata?.launchToOpenFile;
+    if (launchToOpenFile) {
+      this.editorService.open(URI.file(launchToOpenFile));
     }
     electronEnv.ipcRenderer.on('openFile', (event, file) => {
+      if (!file) return;
       this.editorService.open(URI.file(file));
     });
   }

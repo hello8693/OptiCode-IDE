@@ -1,4 +1,4 @@
-import { Configuration, DefinePlugin } from 'webpack'
+import { Configuration, DefinePlugin, NormalModuleReplacementPlugin } from 'webpack'
 import path from 'node:path'
 import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import { merge } from 'webpack-merge'
@@ -53,6 +53,9 @@ export const createConfig = (config: Configuration | ((_env: unknown, argv: Reco
     plugins: [
       new DefinePlugin({
         'process.env.KTLOG_SHOW_DEBUG': argv.mode === 'development',
+      }),
+      new NormalModuleReplacementPlugin(/^node:/, (resource) => {
+        resource.request = resource.request.replace(/^node:/, '');
       }),
     ],
   }, typeof config === 'function' ? config(_env, argv) : config);

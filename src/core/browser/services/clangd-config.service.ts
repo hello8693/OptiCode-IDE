@@ -17,7 +17,8 @@ import {
 import { IFileServiceClient } from '@opensumi/ide-file-service';
 import { IWorkspaceService } from '@opensumi/ide-workspace/lib/common';
 
-import { CPP_PREFERENCE_IDS } from '../cpp/constants';
+import { CPP_PREFERENCE_IDS, STD_DEFAULT } from '../cpp/constants';
+import { ISystemPathService, SystemPathServicePath } from '../../common';
 
 /** compile_commands.json 中的一条记录 */
 interface CompileEntry {
@@ -48,7 +49,11 @@ export class ClangdConfigService implements ClientAppContribution {
   @Autowired(PreferenceService)
   private readonly preferenceService: PreferenceService;
 
+  @Autowired(SystemPathServicePath)
+  private readonly systemPathService: ISystemPathService;
+
   private debounceTimer: ReturnType<typeof setTimeout> | undefined;
+  private cachedPlatform?: string;
 
   async onStart() {
     // 首次生成
@@ -73,6 +78,59 @@ export class ClangdConfigService implements ClientAppContribution {
     const root = await this.rootPath();
     if (!root) return;
     await this.generateCompileCommands(root, true);
+  }
+
+  /** 确保指定文件出现在 compile_commands.json 中（用于草稿纸等场景） */
+  async ensureCompileCommandsForFiles(files: string[]): Promise<void> {
+    const root = await this.rootPath();
+    if (!root || !files.length) return;
+
+    const ccPath = `${root}/.opticode/compile_commands.json`;
+    const ccUri = this.toUri(ccPath);
+    const ccDirUri = this.toUri(`${root}/.opticode`);
+    try {
+      await this.fileService.getFileStat(ccDirUri);
+    } catch {
+      try { await this.fileService.createFolder(ccDirUri); } catch { /* ignore */ }
+    }
+
+    let existing: CompileEntry[] = [];
+    try {
+      const resolved = await this.fileService.resolveContent(ccUri);
+      const parsed = JSON.parse(resolved.content || '[]');
+      if (Array.isArray(parsed)) {
+        existing = parsed as CompileEntry[];
+      }
+    } catch {
+      existing = [];
+    }
+
+    const std = this.preferenceService.getValid(CPP_PREFERENCE_IDS.std, STD_DEFAULT);
+    const stdFlag = this.stdToFlag(std);
+    const userFlags: string[] = this.preferenceService.getValid(CPP_PREFERENCE_IDS.flags, ['-O2', '-Wall']);
+    const compiler = await this.getCompiler();
+    const flags = [stdFlag, ...userFlags.filter(f => !f.startsWith('-std='))];
+
+    const targetSet = new Set(files);
+    const kept = existing.filter(entry => !targetSet.has(entry.file));
+    const appended: CompileEntry[] = files.map(file => ({
+      directory: this.dirname(file),
+      file,
+      arguments: [compiler, ...flags, '-c', file],
+    }));
+
+    const merged = [...kept, ...appended];
+    const json = JSON.stringify(merged, null, 2);
+    try {
+      await this.fileService.createFile(ccUri, { content: json, overwrite: true });
+    } catch {
+      try {
+        await this.fileService.setContent(
+          (await this.fileService.getFileStat(ccUri))!,
+          json,
+        );
+      } catch { /* ignore */ }
+    }
   }
 
   /** 生成 .clangd 配置文件 */
@@ -100,9 +158,16 @@ export class ClangdConfigService implements ClientAppContribution {
    * macOS: 优先选择 Homebrew 安装的 g++-<version>
    */
   private async pickBrewGpp(): Promise<string | undefined> {
-    if (process.platform !== 'darwin') return undefined;
+    const platform = await this.getPlatform();
+    if (platform !== 'darwin') return undefined;
 
-    const dirs = ['/opt/homebrew/bin', '/usr/local/bin'];
+    const dirs = [
+      '/opt/homebrew/bin',
+      '/opt/homebrew/opt/gcc/bin',
+      '/usr/local/bin',
+      '/usr/local/opt/gcc/bin',
+      '/opt/local/bin',
+    ];
     for (const dir of dirs) {
       try {
         const stat = await this.fileService.getFileStat(this.toUri(dir), true);
@@ -133,6 +198,13 @@ export class ClangdConfigService implements ClientAppContribution {
     if (brewGpp) return brewGpp;
 
     return 'g++';
+  }
+
+  private async getPlatform(): Promise<string> {
+    if (!this.cachedPlatform) {
+      this.cachedPlatform = await this.systemPathService.getPlatform();
+    }
+    return this.cachedPlatform;
   }
 
   private async rootPath(): Promise<string | undefined> {
@@ -178,8 +250,14 @@ export class ClangdConfigService implements ClientAppContribution {
    * @param force - true 则无条件覆盖；false 则只在不存在或为自动生成时覆盖
    */
   private async generateCompileCommands(root: string, force: boolean): Promise<void> {
-    const ccPath = `${root}/compile_commands.json`;
+    const ccPath = `${root}/.opticode/compile_commands.json`;
     const ccUri = this.toUri(ccPath);
+    const ccDirUri = this.toUri(`${root}/.opticode`);
+    try {
+      await this.fileService.getFileStat(ccDirUri);
+    } catch {
+      try { await this.fileService.createFolder(ccDirUri); } catch { /* ignore */ }
+    }
 
     // 不再写入 clangd 不认识的标记字段；直接覆盖/生成，避免 Unknown key 报错。
     // 对于自定义文件，用户可关闭偏好或手动管理。
@@ -189,7 +267,7 @@ export class ClangdConfigService implements ClientAppContribution {
     if (cppFiles.length === 0) return;
 
     // 构建 flags
-    const std = this.preferenceService.getValid(CPP_PREFERENCE_IDS.std, 'C++20');
+    const std = this.preferenceService.getValid(CPP_PREFERENCE_IDS.std, STD_DEFAULT);
     const stdFlag = this.stdToFlag(std);
     const userFlags: string[] = this.preferenceService.getValid(CPP_PREFERENCE_IDS.flags, ['-O2', '-Wall']);
     const compiler = await this.getCompiler();
@@ -217,7 +295,7 @@ export class ClangdConfigService implements ClientAppContribution {
   }
 
   private async writeClangdConfig(root: string): Promise<void> {
-    const std = this.preferenceService.getValid(CPP_PREFERENCE_IDS.std, 'C++20');
+    const std = this.preferenceService.getValid(CPP_PREFERENCE_IDS.std, STD_DEFAULT);
     const stdFlag = this.stdToFlag(std);
     const userFlags: string[] = this.preferenceService.getValid(CPP_PREFERENCE_IDS.flags, ['-O2', '-Wall']);
     const compiler = await this.getCompiler();

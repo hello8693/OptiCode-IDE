@@ -10,10 +10,20 @@ export async function startServer(arg1: NodeModule[] | Partial<IServerAppOpts>) 
   const deferred = new Deferred<http.Server>();
   process.env.EXT_MODE = 'js';
   const port = process.env.IDE_SERVER_PORT || 8000;
-  const workspaceDir = process.env.WORKSPACE_DIR || process.env.NODE_ENV === 'production' ? path.join(__dirname, '../../workspace') : path.join(__dirname, '../../../workspace');
-  const extensionDir = process.env.EXTENSION_DIR || process.env.NODE_ENV === 'production' ? path.join(__dirname, '../../extensions') : path.join(__dirname, '../../../extensions');
-  const extensionHost = process.env.EXTENSION_HOST_ENTRY || 
-  process.env.NODE_ENV === 'production' ? path.join(__dirname, '..', '..', 'out/ext-host/index.js') : path.join(__dirname, '..', '..', '..', 'out/ext-host/index.js');
+  const workspaceDir = process.env.WORKSPACE_DIR || (process.env.NODE_ENV === 'production'
+    ? path.join(__dirname, '../../workspace')
+    : path.join(__dirname, '../../../workspace'));
+  const extensionDir = process.env.EXTENSION_DIR || (process.env.NODE_ENV === 'production'
+    ? path.join(__dirname, '../../extensions')
+    : path.join(__dirname, '../../../extensions'));
+  const extensionHost = process.env.EXTENSION_HOST_ENTRY || (process.env.NODE_ENV === 'production'
+    ? path.join(__dirname, '..', '..', 'out/ext-host/index.js')
+    : path.join(__dirname, '..', '..', '..', 'out/ext-host/index.js'));
+
+  process.env.WORKSPACE_DIR = workspaceDir;
+  process.env.IDE_WORKSPACE_DIR = workspaceDir;
+  process.env.EXTENSION_DIR = extensionDir;
+  process.env.EXTENSION_HOST_ENTRY = extensionHost;
 
   let opts: IServerAppOpts = {
     use: app.use.bind(app),
@@ -30,6 +40,7 @@ export async function startServer(arg1: NodeModule[] | Partial<IServerAppOpts>) 
 
   opts.marketplace = {
     showBuiltinExtensions: true,
+    extensionDir,
   }
   
   if (Array.isArray(arg1)) {

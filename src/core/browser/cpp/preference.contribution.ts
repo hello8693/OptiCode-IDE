@@ -12,6 +12,7 @@ import { SettingContribution, ISettingRegistry } from '@opensumi/ide-preferences
 
 import { STD_OPTIONS, STD_DEFAULT, STD_KEY, OPT_KEY, OPT_OPTIONS, CPP_PREFERENCE_IDS } from './constants';
 import { CppTemplateSettingsSection } from './template-settings-section';
+import { CompetitiveCompanionSettingsSection } from '../competitive-companion/settings-section';
 import { IStorageService } from '../../common';
 export const CPP_SETTING_SECTION_ID = 'oi.cpp';
 
@@ -78,6 +79,11 @@ export class CppPreferenceContribution implements PreferenceContribution, Settin
     registry.registerSettingSection(CPP_SETTING_SECTION_ID, {
       title: '源码模板',
       component: CppTemplateSettingsSection,
+    });
+
+    registry.registerSettingSection(CPP_SETTING_SECTION_ID, {
+      title: 'Competitive Companion',
+      component: CompetitiveCompanionSettingsSection,
     });
   }
 

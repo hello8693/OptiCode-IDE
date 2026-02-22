@@ -1,7 +1,15 @@
 import http from 'node:http';
+import fs from 'node:fs/promises';
 import { Injectable, Autowired } from '@opensumi/di';
 import { ILogService } from '@/logger/common';
-import { DEFAULT_COMPETITIVE_COMPANION_PORTS, CompetitiveCompanionPayload } from '@/core/common/competitive-companion';
+import {
+  DEFAULT_COMPETITIVE_COMPANION_PORTS,
+  CompetitiveCompanionPayload,
+  COMPETITIVE_COMPANION_SETTINGS_KEY,
+  COMPETITIVE_COMPANION_LAST_WORKSPACE_KEY,
+  DEFAULT_COMPETITIVE_COMPANION_SETTINGS,
+  CompetitiveCompanionSettings,
+} from '@/core/common/competitive-companion';
 import { CompetitiveCompanionService } from './competitive-companion.service';
 
 const MAX_BODY_SIZE = 2 * 1024 * 1024;
@@ -19,7 +27,14 @@ export class CompetitiveCompanionServer {
 
   async start(): Promise<void> {
     if (this.server) return;
-    for (const port of DEFAULT_COMPETITIVE_COMPANION_PORTS) {
+    const settings = await this.readSettings();
+    if (!settings.enabled) {
+      this.logger.info('[CompetitiveCompanion] Disabled by settings.');
+      return;
+    }
+
+    const ports = settings.ports.length ? settings.ports : DEFAULT_COMPETITIVE_COMPANION_PORTS;
+    for (const port of ports) {
       const ok = await this.tryListen(port);
       if (ok) {
         this.port = port;
@@ -27,7 +42,7 @@ export class CompetitiveCompanionServer {
         return;
       }
     }
-    this.logger.error('[CompetitiveCompanion] Failed to bind ports 27121-27125.');
+    this.logger.error(`[CompetitiveCompanion] Failed to bind ports: ${ports.join(', ') || 'none'}.`);
   }
 
   async stop(): Promise<void> {
@@ -84,7 +99,7 @@ export class CompetitiveCompanionServer {
       return;
     }
 
-    const workspaceDir = this.getWorkspaceDir();
+    const workspaceDir = await this.getWorkspaceDir();
     if (!workspaceDir) {
       res.writeHead(500, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'error', message: 'Workspace not available' }));
@@ -122,7 +137,61 @@ export class CompetitiveCompanionServer {
     });
   }
 
-  private getWorkspaceDir(): string | undefined {
+  private async getWorkspaceDir(): Promise<string | undefined> {
+    const fromStorage = await this.readLastWorkspaceFromStorage();
+    if (fromStorage) return fromStorage;
     return process.env.WORKSPACE_DIR || process.env.IDE_WORKSPACE_DIR;
+  }
+
+  private async readSettings(): Promise<CompetitiveCompanionSettings> {
+    const storagePath = process.env.IDE_STORAGE_PATH;
+    if (!storagePath) return DEFAULT_COMPETITIVE_COMPANION_SETTINGS;
+    try {
+      const content = await fs.readFile(storagePath, 'utf8');
+      const data = JSON.parse(content) as Record<string, unknown>;
+      return this.normalizeSettings(data?.[COMPETITIVE_COMPANION_SETTINGS_KEY]);
+    } catch {
+      return DEFAULT_COMPETITIVE_COMPANION_SETTINGS;
+    }
+  }
+
+  private normalizeSettings(raw: unknown): CompetitiveCompanionSettings {
+    const fallback = DEFAULT_COMPETITIVE_COMPANION_SETTINGS;
+    const input = (raw || {}) as Partial<CompetitiveCompanionSettings>;
+    const enabled = typeof input.enabled === 'boolean' ? input.enabled : fallback.enabled;
+    const ports = Array.isArray(input.ports) ? input.ports : fallback.ports;
+    const normalizedPorts = Array.from(
+      new Set(
+        ports
+          .map((p) => Number(p))
+          .filter((p) => Number.isFinite(p) && p > 0 && p <= 65535)
+          .map((p) => Math.trunc(p)),
+      ),
+    );
+    return {
+      enabled,
+      ports: normalizedPorts.length ? normalizedPorts : fallback.ports,
+    };
+  }
+
+  private async readLastWorkspaceFromStorage(): Promise<string | undefined> {
+    const storagePath = process.env.IDE_STORAGE_PATH;
+    if (!storagePath) return undefined;
+    try {
+      const content = await fs.readFile(storagePath, 'utf8');
+      const data = JSON.parse(content) as Record<string, unknown>;
+      const candidate = data?.[COMPETITIVE_COMPANION_LAST_WORKSPACE_KEY];
+      if (typeof candidate !== 'string' || !candidate.trim()) return undefined;
+      const normalized = candidate.trim();
+      try {
+        const stat = await fs.stat(normalized);
+        if (stat.isDirectory()) return normalized;
+      } catch {
+        return undefined;
+      }
+      return normalized;
+    } catch {
+      return undefined;
+    }
   }
 }

@@ -121,6 +121,9 @@ export default createConfig((_env, argv) => {
         'process.env.EXTENSION_DIR': JSON.stringify(
           isDevelopment ? path.join(__dirname, '../..', 'extensions') : process.env['EXTENSION_DIR'],
         ),
+        'process.env.STORAGE_DIR_NAME': JSON.stringify(process.env['STORAGE_DIR_NAME']),
+        'process.env.PREFERENCE_DIR_NAME': JSON.stringify(process.env['PREFERENCE_DIR_NAME']),
+        'process.env.EXTENSION_STORAGE_DIR_NAME': JSON.stringify(process.env['EXTENSION_STORAGE_DIR_NAME']),
         'process.env.REVERSION': JSON.stringify(idePkg.version || 'alpha'),
         'process.env.DEVELOPMENT': JSON.stringify(!!isDevelopment),
         'process.env.TEMPLATE_TYPE': JSON.stringify(

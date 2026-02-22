@@ -100,6 +100,12 @@ export interface IProblemService {
    */
   deleteProblem(id: string): Promise<void>;
 
+  /**
+   * 判断当前工作区是否为 OptiCode 题目结构。
+   * 规则：存在 .opticode 或至少一个题目文件夹（meta.json 或 <id>.cpp）。
+   */
+  isOptiCodeWorkspace(): Promise<boolean>;
+
   /* ── 元信息 ── */
 
   /** 读取 meta.json */

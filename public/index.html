@@ -6,56 +6,72 @@
     <style>
       body {
         margin: 0;
-        background: radial-gradient(120% 140% at 10% 10%, #1e1e1e, #121212);
-        color: #e8e8e8;
-        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-        user-select: none;
         height: 100vh;
         overflow: hidden;
+        background: #0b0c10;
+        color: #eef2f7;
+        font-family: "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Avenir Next", "Segoe UI", sans-serif;
+        user-select: none;
       }
       #main {
         height: 100vh;
       }
       #loader {
-        position: absolute;
+        position: fixed;
         inset: 0;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
-        gap: 12px;
-        background: #0d0d0f;
-        color: #e8e8e8;
-        z-index: 1;
+        gap: 10px;
+        background: #0b0c10;
+        color: #eef2f7;
       }
-      .spinner {
-        width: 44px;
-        height: 44px;
-        border: 4px solid rgba(255, 255, 255, 0.08);
-        border-top-color: #5ad1ff;
+      .loader-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        text-align: center;
+      }
+      .loader-ring {
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        animation: spin 1s linear infinite;
-      }
-      @keyframes spin {
-        to { transform: rotate(360deg); }
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top-color: rgba(255, 255, 255, 0.85);
+        animation: fallback-spin 1s linear infinite;
       }
       .loader-text {
-        letter-spacing: 0.4px;
         font-weight: 600;
         font-size: 15px;
-        opacity: 0.9;
+        letter-spacing: 0.2px;
+        opacity: 0.95;
       }
       .loader-sub {
         font-size: 12px;
-        opacity: 0.65;
+        letter-spacing: 0.2px;
+        opacity: 0.66;
+      }
+      @keyframes fallback-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .loader-ring {
+          animation: none;
+        }
       }
     </style>
   </head>
   <body>
     <div id="loader">
-      <div class="spinner" aria-label="Loading"></div>
-      <div class="loader-text">OptiCode 正在启动…</div>
-      <div class="loader-sub">初始化工作区与扩展，请稍候</div>
+      <div class="loader-content">
+        <div class="loader-ring" aria-hidden="true"></div>
+        <div class="loader-text">OptiCode 正在启动…</div>
+        <div class="loader-sub">初始化工作区与扩展，请稍候</div>
+      </div>
     </div>
     <div id="main"></div>
     <script>
@@ -66,6 +82,10 @@
         if (!loader || !main) return;
 
         const hide = () => {
+          const unmount = window.__opticodeUnmountLoader;
+          if (typeof unmount === 'function') {
+            unmount();
+          }
           loader.style.opacity = '0';
           loader.style.transition = 'opacity 180ms ease-out';
           setTimeout(() => loader.remove(), 220);

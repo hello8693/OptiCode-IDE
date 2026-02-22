@@ -10,20 +10,30 @@ export async function renderApp(opts: IClientAppOpts) {
 
   const hostname = window.location.hostname;
   const query = new URLSearchParams(window.location.search);
+  const hash = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : '';
+  const devFlag = typeof process !== 'undefined' ? process.env.DEVELOPMENT : undefined;
+  const isDev = devFlag === true || devFlag === 'true';
   // 线上的静态服务和 IDE 后端是一个 Server
-  const serverPort = process.env.DEVELOPMENT ? 8000 : window.location.port;
-  const staticServerPort = process.env.DEVELOPMENT ? 8080 : window.location.port;
-  const webviewEndpointPort = process.env.DEVELOPMENT ? 8899 : window.location.port;
+  const serverPort = isDev ? 8000 : window.location.port;
+  const staticServerPort = isDev ? 8080 : window.location.port;
+  const webviewEndpointPort = isDev ? 8899 : window.location.port;
   opts.appName= 'OptiCode IDE';
-  opts.workspaceDir = opts.workspaceDir || query.get('workspaceDir') || process.env.WORKSPACE_DIR;
+  const queryWorkspaceDir = query.get('workspaceDir') || hash || '';
+  const workspaceDir = typeof process !== 'undefined' ? process.env.WORKSPACE_DIR : undefined;
+  const extensionDir = typeof process !== 'undefined' ? process.env.EXTENSION_DIR : undefined;
+  const wsPath = typeof process !== 'undefined' ? process.env.WS_PATH : undefined;
+  const extensionWorkerHost = typeof process !== 'undefined' ? process.env.EXTENSION_WORKER_HOST : undefined;
+  const staticServerPath = typeof process !== 'undefined' ? process.env.STATIC_SERVER_PATH : undefined;
+  const webviewHost = typeof process !== 'undefined' ? process.env.WEBVIEW_HOST : undefined;
 
-  opts.extensionDir = opts.extensionDir || process.env.EXTENSION_DIR;
+  opts.workspaceDir = queryWorkspaceDir || opts.workspaceDir || (workspaceDir as string | undefined);
+  opts.extensionDir = opts.extensionDir || (extensionDir as string | undefined);
 
-  opts.wsPath = process.env.WS_PATH || (window.location.protocol == 'https:' ? `wss://${hostname}:${serverPort}` : `ws://${hostname}:${serverPort}`);
+  opts.wsPath = (wsPath as string | undefined) || (window.location.protocol == 'https:' ? `wss://${hostname}:${serverPort}` : `ws://${hostname}:${serverPort}`);
   console.log(opts.wsPath)
-  opts.extWorkerHost = opts.extWorkerHost || process.env.EXTENSION_WORKER_HOST || `http://${hostname}:${staticServerPort}/ext-host/worker-host.js`;
-  opts.staticServicePath = `http://${hostname}:${serverPort}`;
-  const anotherHostName = process.env.WEBVIEW_HOST || hostname;
+  opts.extWorkerHost = opts.extWorkerHost || (extensionWorkerHost as string | undefined) || `http://${hostname}:${staticServerPort}/ext-host/worker-host.js`;
+  opts.staticServicePath = (staticServerPath as string | undefined) || `http://${hostname}:${serverPort}`;
+  const anotherHostName = (webviewHost as string | undefined) || hostname;
   opts.webviewEndpoint = `http://${anotherHostName}:${webviewEndpointPort}/webview`;
   opts.layoutComponent = opts.layoutComponent || ToolbarActionBasedLayout;
   opts.injector = injector

@@ -1,5 +1,5 @@
 export const STD_OPTIONS = ['C++14', 'C++17', 'C++20', 'C++23'];
-export const STD_DEFAULT = 'C++20';
+export const STD_DEFAULT = 'C++14';
 export const OPT_OPTIONS = ['O2', 'Debug', 'Sanitize'];
 
 export const STD_KEY = 'singlefile.cpp.std';

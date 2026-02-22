@@ -1,6 +1,8 @@
 import * as vscode from 'vscode';
 import { LanguageClient, LanguageClientOptions, ServerOptions } from 'vscode-languageclient/node';
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
+import * as fs from 'fs';
+import * as path from 'path';
 import { ctx, CLANGD_DOCUMENT_SELECTOR } from './types';
 import { cfg, updateStatus } from './config';
 import { resolveClangdPath, installClangd } from './install';
@@ -22,6 +24,7 @@ export async function startClient(): Promise<void> {
 
   ctx.outputChannel.appendLine(`[clangd] 使用路径: ${clangdPath}`);
   const args = buildClangdArgs();
+  ctx.outputChannel.appendLine(`[clangd] args: ${args.join(' ')}`);
   const serverOptions: ServerOptions = { command: clangdPath, args };
   const clientOptions: LanguageClientOptions = {
     documentSelector: CLANGD_DOCUMENT_SELECTOR as any,
@@ -33,6 +36,10 @@ export async function startClient(): Promise<void> {
     },
     middleware: buildMiddleware(),
   };
+  const fallback = (clientOptions.initializationOptions as any)?.fallbackFlags;
+  if (Array.isArray(fallback)) {
+    ctx.outputChannel.appendLine(`[clangd] fallbackFlags: ${fallback.join(' ')}`);
+  }
 
   const client = new LanguageClient('clangd', 'clangd 语言服务器', serverOptions, clientOptions);
   ctx.client = client;
@@ -77,23 +84,27 @@ function buildClangdArgs(): string[] {
     '--header-insertion=iwyu',
     '--pch-storage=memory',
     '--function-arg-placeholders',
-    '--compile-commands-dir=.opticode',
   ];
+  const workspace = vscode.workspace.workspaceFolders?.[0];
+  if (workspace) {
+    const opticodeDir = path.join(workspace.uri.fsPath, '.opticode');
+    args.push(`--compile-commands-dir=${opticodeDir}`);
+  }
   if (cfg<boolean>('enableInlayHints', true)) args.push('--inlay-hints=true');
   const trace = cfg<string>('trace', '').trim();
-  const logLevel = cfg<string>('logLevel', 'error');
+  const logLevel = normalizeLogLevel(cfg<string>('logLevel', 'error'));
   if (trace) {
     args.push('--log=verbose');
     args.push(`--trace=${trace}`);
-  } else {
+  } else if (logLevel) {
     args.push(`--log=${logLevel}`);
   }
-  const userArgs = cfg<string[]>('arguments', []);
+  const userArgs = sanitizeUserArgs(cfg<string[]>('arguments', []));
   args.push(...userArgs);
 
    // 如果用户未指定 query-driver，则为常见的 g++ 路径添加 query-driver，确保拾取 GCC 头文件（bits/stdc++.h 等）
   if (!args.some(a => a.startsWith('--query-driver'))) {
-    const queryDrivers = buildQueryDrivers();
+    const queryDrivers = getQueryDriversForClangd();
     if (queryDrivers.length > 0) {
       args.push(`--query-driver=${queryDrivers.join(',')}`);
     }
@@ -102,7 +113,7 @@ function buildClangdArgs(): string[] {
 }
 
 function buildFallbackFlags(): string[] {
-  const base = cfg<string[]>('fallbackFlags', ['-std=c++20', '-Wall']);
+  const base = cfg<string[]>('fallbackFlags', ['-std=c++14', '-Wall']);
   const extra = detectGccIncludeFlags();
   return dedupe([...base, ...extra]);
 }
@@ -111,14 +122,21 @@ function detectGccIncludeFlags(): string[] {
   const flags: string[] = [];
   if (process.platform === 'win32') return flags;
 
-  const candidates = buildQueryDrivers();
-  const compiler = candidates.find(p => !p.includes('*')) || 'g++';
+  const compiler = resolveCompilerForIncludes();
+  const detected = collectIncludePathsFromCompiler(compiler);
+  for (const p of detected) {
+    if (!p) continue;
+    if (shouldSkipIncludePath(p)) continue;
+    flags.push(`-isystem${p}`);
+  }
 
   const tryPath = (cmd: string) => {
     try {
       const out = execSync(cmd, { encoding: 'utf-8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
       if (out && out !== 'include' && out !== 'include/c++/') {
-        flags.push(`-isystem${out}`);
+        if (!shouldSkipIncludePath(out)) {
+          flags.push(`-isystem${out}`);
+        }
       }
     } catch {
       /* ignore */
@@ -130,6 +148,13 @@ function detectGccIncludeFlags(): string[] {
   return flags;
 }
 
+function shouldSkipIncludePath(p: string): boolean {
+  if (process.platform !== 'darwin') return false;
+  const normalized = p.replace(/\\/g, '/');
+  // Apple clangd + GCC internal headers -> __float128 not supported on target
+  return /\/lib\/gcc\/.+\/include(-fixed)?$/.test(normalized);
+}
+
 function dedupe(arr: string[]): string[] {
   const seen = new Set<string>();
   const res: string[] = [];
@@ -139,6 +164,68 @@ function dedupe(arr: string[]): string[] {
     res.push(a);
   }
   return res;
+}
+
+function resolveCompilerForIncludes(): string {
+  const candidates = buildQueryDrivers();
+  for (const candidate of candidates) {
+    const resolved = resolveQueryDriver(candidate);
+    if (resolved) return resolved;
+  }
+  return 'g++';
+}
+
+function resolveQueryDriver(candidate: string): string | undefined {
+  if (!candidate.includes('*')) {
+    return fs.existsSync(candidate) ? candidate : undefined;
+  }
+  const dir = path.dirname(candidate);
+  if (!fs.existsSync(dir)) return undefined;
+  const base = path.basename(candidate);
+  if (!base.startsWith('g++-')) return undefined;
+  try {
+    const entries = fs.readdirSync(dir);
+    const bins = entries
+      .filter(name => /^g\+\+-(\d+)$/.test(name))
+      .map(name => ({ name, ver: parseInt(name.split('-')[1], 10) }))
+      .sort((a, b) => b.ver - a.ver);
+    if (bins.length) return path.join(dir, bins[0].name);
+  } catch {
+    // ignore
+  }
+  return undefined;
+}
+
+function collectIncludePathsFromCompiler(compiler: string): string[] {
+  const result: string[] = [];
+  try {
+    const res = spawnSync(compiler, ['-E', '-x', 'c++', '-', '-v'], {
+      input: '',
+      encoding: 'utf-8',
+    });
+    const stderr = (res.stderr || '').toString();
+    const lines = stderr.split(/\r?\n/);
+    let inBlock = false;
+    for (const line of lines) {
+      if (line.includes('#include <...> search starts here:')) {
+        inBlock = true;
+        continue;
+      }
+      if (line.includes('End of search list.')) {
+        break;
+      }
+      if (!inBlock) continue;
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      if (trimmed.startsWith('(')) continue;
+      if (fs.existsSync(trimmed)) {
+        result.push(trimmed);
+      }
+    }
+  } catch {
+    // ignore
+  }
+  return result;
 }
 
 function buildQueryDrivers(): string[] {
@@ -154,7 +241,9 @@ function buildQueryDrivers(): string[] {
     return [
       '/opt/homebrew/bin/g++-*',
       '/opt/homebrew/opt/gcc/bin/g++-*',
+      '/usr/local/opt/gcc/bin/g++-*',
       '/usr/local/bin/g++-*',
+      '/opt/local/bin/g++-*',
       '/usr/bin/g++',
     ];
   }
@@ -164,6 +253,39 @@ function buildQueryDrivers(): string[] {
     '/usr/bin/g++-*',
     '/usr/local/bin/g++-*',
   ];
+}
+
+function getQueryDriversForClangd(): string[] {
+  const drivers: string[] = [];
+  const resolved = resolveCompilerForIncludes();
+  if (resolved && resolved !== 'g++') drivers.push(resolved);
+  drivers.push(...buildQueryDrivers());
+  return dedupe(drivers);
+}
+
+function normalizeLogLevel(level: string): string {
+  const val = (level || '').toLowerCase().trim();
+  if (!val) return '';
+  if (val === 'warning' || val === 'warn') return 'info';
+  if (['error', 'info', 'verbose'].includes(val)) return val;
+  return 'error';
+}
+
+function sanitizeUserArgs(args: string[]): string[] {
+  const res: string[] = [];
+  for (const arg of args || []) {
+    if (typeof arg !== 'string') continue;
+    if (arg.startsWith('--log=')) {
+      const val = arg.slice('--log='.length);
+      const normalized = normalizeLogLevel(val);
+      if (normalized) {
+        res.push(`--log=${normalized}`);
+      }
+      continue;
+    }
+    res.push(arg);
+  }
+  return res;
 }
 
 function buildMiddleware() {

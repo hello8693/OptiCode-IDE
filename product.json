@@ -3,8 +3,8 @@
   "applicationName": "OptiCodeIDE",
   "dataFolderName": ".opticode-ide",
   "urlProtocol": "opticode-ide",
-  "darwinBundleIdentifier": "com.alipay.opticode.ide",
-  "autoUpdaterConfigUrl": "https://render.alipay.com/p/yuyan/opticode-ide-data_auto-update/zh_CN.json",
+  "darwinBundleIdentifier": "com.opti.opticode.ide",
+  "autoUpdaterConfigUrl": "",
   "commit": "",
   "date": ""
 }

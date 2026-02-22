@@ -109,6 +109,7 @@ const layoutConfig: LayoutConfig = {
     modules: [
       '@opensumi/ide-explorer',
       'problem-list-container',
+      'scratchpad-container',
       'sample-test-container',
       'compile-run-container',
       '@opensumi/ide-extension-manager',
@@ -159,6 +160,7 @@ async function renderApp() {
     storageDirName: electronEnv.metadata.environment.dataFolderName,
     extensionStorageDirName: electronEnv.metadata.environment.dataFolderName,
     extWorkerHost: electronEnv.metadata.workerHostEntry ? URI.file(electronEnv.metadata.workerHostEntry).toString() : undefined,
+    ignoreWorkerHostCors: true,
     defaultPreferences: {
       'settings.userBeforeWorkspace': true,
       'general.theme': 'opensumi-dark',

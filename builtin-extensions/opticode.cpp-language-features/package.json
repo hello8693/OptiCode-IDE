@@ -13,6 +13,7 @@
     "Programming Languages"
   ],
   "activationEvents": [
+    "onStartupFinished",
     "onLanguage:c",
     "onLanguage:cpp",
     "onLanguage:cuda-cpp",
@@ -67,7 +68,7 @@
             "type": "string"
           },
           "default": [
-            "-std=c++20",
+            "-std=c++14",
             "-Wall"
           ],
           "markdownDescription": "当没有 `compile_commands.json` 时使用的编译参数。"
