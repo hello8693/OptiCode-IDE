@@ -164,7 +164,7 @@ export class ProblemService implements IProblemService {
   }
 
   private toUri(fsPath: string): string {
-    return new URI(`file://${fsPath}`).toString();
+    return URI.file(fsPath).toString();
   }
 
   /* ────────── 创建题目 ────────── */
