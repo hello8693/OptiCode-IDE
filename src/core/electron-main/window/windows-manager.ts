@@ -4,6 +4,7 @@ import { Injectable, INJECTOR_TOKEN, Autowired, Injector } from '@opensumi/di'
 import { IWindowOpenOptions, ElectronAppConfig, IElectronMainApp, ElectronMainApp } from '@opensumi/ide-core-electron-main'
 import { IEnvironmentService, StorageKey } from '../../common'
 import { ThemeService } from '../theme.service'
+import { getStartupTiming } from '@/core/common/startup-timing'
 
 @Injectable()
 export class WindowsManager {
@@ -21,6 +22,25 @@ export class WindowsManager {
 
   @Autowired(ThemeService)
   themeService: ThemeService;
+
+  hasCodeWindow(): boolean {
+    return this.mainApp.getCodeWindows().length > 0;
+  }
+
+  getFirstBrowserWindow() {
+    const codeWindow = this.mainApp.getCodeWindows()[0];
+    return codeWindow?.getBrowserWindow();
+  }
+
+  focusExistingWindow(): boolean {
+    const win = this.getFirstBrowserWindow();
+    if (!win || win.isDestroyed()) return false;
+    if (!win.isVisible()) {
+      win.show();
+    }
+    win.focus();
+    return true;
+  }
 
   openCodeWindow(workspaceUri?: URI, options?: IWindowOpenOptions) {
     if (workspaceUri) {
@@ -49,6 +69,7 @@ export class WindowsManager {
     metadata?: any,
     browserWindowOptions?: BrowserWindowConstructorOptions,
   ) {
+    const timing = getStartupTiming('main');
     this.themeService.setSystemTheme();
     const editorBackground = this.themeService.themeBackgroundColor.editorBackground ||  '#1e1e1e'
     const menuBarBackground = this.themeService.themeBackgroundColor.menuBarBackground || editorBackground;
@@ -85,9 +106,13 @@ export class WindowsManager {
     );
 
     const browserWindow = codeWindow.getBrowserWindow()
-    // 默认全屏
-    // TODO: 支持窗口状态缓存
-    browserWindow.maximize();
-    browserWindow.show();
+
+    browserWindow.once('ready-to-show', () => {
+      timing.mark('code-window.ready-to-show');
+    });
+
+    browserWindow.webContents.once('did-finish-load', () => {
+      timing.mark('code-window.did-finish-load');
+    });
   }
 }

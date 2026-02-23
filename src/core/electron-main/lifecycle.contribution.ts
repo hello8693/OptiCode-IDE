@@ -7,6 +7,7 @@ import { ElectronMainContribution } from './types'
 import { IEnvironmentService } from '../common'
 import { StorageService } from './storage.service'
 import { WindowsManager } from './window/windows-manager'
+import { SplashWindow } from './window/splash-window'
 
 @Domain(ElectronMainContribution)
 export class LifecycleContribution implements ElectronMainContribution {
@@ -18,6 +19,9 @@ export class LifecycleContribution implements ElectronMainContribution {
 
   @Autowired(WindowsManager)
   windowsManager: WindowsManager
+
+  @Autowired(SplashWindow)
+  splashWindow: SplashWindow
 
   @Autowired(ILogService)
   logger: ILogService
@@ -34,12 +38,17 @@ export class LifecycleContribution implements ElectronMainContribution {
   }
 
   onStart() {
-    this.windowsManager.createCodeWindow()
+    this.splashWindow.show()
+    if (!this.windowsManager.hasCodeWindow()) {
+      this.windowsManager.createCodeWindow()
+    }
 
     app.on('activate', (_e, hasVisibleWindows) => {
       this.logger.debug('lifecycle#activate')
       if (!hasVisibleWindows) {
-        this.windowsManager.createCodeWindow()
+        if (!this.windowsManager.hasCodeWindow()) {
+          this.windowsManager.createCodeWindow()
+        }
       }
     })
   }

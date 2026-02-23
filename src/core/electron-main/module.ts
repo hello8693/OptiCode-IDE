@@ -11,6 +11,7 @@ import { AppWindowService } from './window/app-window.service'
 import { AppMenuContribution, AppMenuService } from './menu.contribution'
 import { WindowContribution } from './window/window.contribution'
 import { WorkspaceHistoryContribution } from './workspace/workspace-history.contribution'
+import { SplashWindow } from './window/splash-window'
 
 export * from './storage.service'
 
@@ -27,6 +28,7 @@ export class CoreElectronMainModule extends ElectronMainModule {
     AppWindowContribution,
     AppWindowService,
     WindowContribution,
+    SplashWindow,
     WindowsManager,
     WorkspaceHistoryContribution,
     {

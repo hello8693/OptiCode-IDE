@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { DefinePlugin } from 'webpack';
 import product from '../../product.json';
-import { createConfig, webpackDir, devServerPort, codeWindowName, updateWindowName } from './webpack.base.config';
+import { createConfig, webpackDir, devServerPort, codeWindowName, updateWindowName, splashWindowName } from './webpack.base.config';
 import { asarDeps } from '../deps'
 
 const srcDir = path.resolve('src/bootstrap/electron-main');
@@ -27,8 +27,10 @@ export default createConfig((_, argv) => ({
       __PRODUCT__: JSON.stringify(product),
       __CODE_WINDOW_NAME__: `'${codeWindowName}'`,
       __UPDATE_WINDOW_NAME__: `'${updateWindowName}'`,
+      __SPLASH_WINDOW_NAME__: `'${splashWindowName}'`,
       __CODE_WINDOW_DEV_SERVER_URL__: argv.mode === 'development' ? `'http://localhost:${devServerPort}/${codeWindowName}'` : "''",
       __UPDATE_WINDOW_DEV_SERVER_URL__: argv.mode === 'development' ? `'http://localhost:${devServerPort}/${updateWindowName}'` : "''",
+      __SPLASH_WINDOW_DEV_SERVER_URL__: argv.mode === 'development' ? `'http://localhost:${devServerPort}/${splashWindowName}'` : "''",
     }),
   ]
 }));

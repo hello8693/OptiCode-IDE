@@ -2,11 +2,12 @@ import path from 'node:path';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import CopyPlugin from 'copy-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
-import { createConfig, webpackDir, devServerPort, codeWindowName, updateWindowName } from './webpack.base.config';
+import { createConfig, webpackDir, devServerPort, codeWindowName, updateWindowName, splashWindowName } from './webpack.base.config';
 
 const srcDir = path.resolve('src/bootstrap/browser');
 const outDir = path.resolve(webpackDir, 'renderer');
 const updateSrcDir = path.resolve('src/auto-updater/update-window');
+const splashSrcDir = path.resolve('src/bootstrap/splash');
 
 export default createConfig((_env, argv) => {
   const styleLoader = argv.mode === 'production' ? MiniCssExtractPlugin.loader : 'style-loader'
@@ -15,6 +16,7 @@ export default createConfig((_env, argv) => {
     entry: {
       [codeWindowName]: path.resolve(srcDir, 'index.ts'),
       [updateWindowName]: path.resolve(updateSrcDir, 'index.tsx'),
+      [splashWindowName]: path.resolve(splashSrcDir, 'index.tsx'),
     },
     output: {
       filename: '[name]/index.js',
@@ -109,6 +111,11 @@ export default createConfig((_env, argv) => {
         template: path.join(updateSrcDir, 'index.html'),
         filename: `${updateWindowName}/index.html`,
         chunks: [updateWindowName]
+      }),
+      new HtmlWebpackPlugin({
+        template: path.join(splashSrcDir, 'index.html'),
+        filename: `${splashWindowName}/index.html`,
+        chunks: [splashWindowName]
       }),
       ...(argv.mode === 'production' ? [
         new MiniCssExtractPlugin({

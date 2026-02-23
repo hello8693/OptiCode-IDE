@@ -5,12 +5,14 @@ import { ILogService } from '@/logger/common'
 import { ElectronMainContribution } from './types'
 import { isMacintosh } from '@opensumi/ide-core-common';
 import { WindowsManager } from './window/windows-manager';
+import { getStartupTiming, StartupTiming } from '@/core/common/startup-timing'
 
 export class ElectronMainApp {
   private injector = new Injector;
   private baseApp: BaseElectronMainApp;
   private logger: ILogService
   private pendingQuit = false;
+  private startupTiming: StartupTiming;
 
   constructor(config: ElectronAppConfig) {
     this.baseApp = new BaseElectronMainApp({
@@ -18,6 +20,8 @@ export class ElectronMainApp {
       injector: this.injector,
     })
     this.logger = this.injector.get(ILogService);
+    this.startupTiming = getStartupTiming('main', this.logger);
+    this.startupTiming.mark('construct');
     for (const contribution of this.contributions) {
       if (contribution.onBeforeReady) {
         contribution.onBeforeReady();
@@ -31,16 +35,22 @@ export class ElectronMainApp {
 
   async start() {
     this.logger.log('start')
+    this.startupTiming.mark('start.begin')
     await app.whenReady();
+    this.startupTiming.mark('app.whenReady')
     this.registerListenerAfterReady()
 
     this.logger.log('trigger onWillStart')
+    this.startupTiming.mark('onWillStart.begin')
     await Promise.all(this.contributions.map(contribution => contribution.onWillStart?.()))
+    this.startupTiming.mark('onWillStart.end')
     this.claimInstance();
     this.moveToApplication()
 
     this.logger.log('trigger onStart')
+    this.startupTiming.mark('onStart.begin')
     await Promise.all(this.contributions.map(contribution => contribution.onStart?.()))
+    this.startupTiming.mark('onStart.end')
   }
 
   private registerListenerAfterReady() {
@@ -84,7 +94,11 @@ export class ElectronMainApp {
         if (isMacintosh) {
           app.focus({ steal: true });
         }
-        this.injector.get(WindowsManager).createCodeWindow()
+        const windowsManager = this.injector.get(WindowsManager);
+        const focused = windowsManager.focusExistingWindow();
+        if (!focused) {
+          windowsManager.createCodeWindow();
+        }
       })
     }
   }

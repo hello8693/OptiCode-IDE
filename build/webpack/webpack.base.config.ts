@@ -11,6 +11,8 @@ export const codeWindowName = 'code'
 
 export const updateWindowName = 'update'
 
+export const splashWindowName = 'splash'
+
 export const createConfig = (config: Configuration | ((_env: unknown, argv: Record<string, any>) => Configuration)) => (_env: unknown, argv: Record<string, any>) => {
   return merge({
     mode: argv.mode,

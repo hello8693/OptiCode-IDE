@@ -5,7 +5,9 @@ import '@opensumi/ide-core-browser/lib/style/icon.less';
 import './index.less'
 
 import { DEFAULT_LAYOUT_VIEW_SIZE } from '@opensumi/ide-core-browser/lib/layout/constants';
+import { RenderedEvent } from '@opensumi/ide-core-browser/lib/layout/layout.interface';
 import { IElectronMainLifeCycleService } from '@opensumi/ide-core-common/lib/electron';
+import { IEventBus } from '@opensumi/ide-core-common';
 import { IClientAppOpts, electronEnv, URI, ClientCommonModule, BrowserModule, ConstructorOf, LayoutConfig, SlotLocation } from '@opensumi/ide-core-browser';
 import { ToolbarActionBasedLayout } from '@opensumi/ide-core-browser/lib/components';
 import { ClientApp } from '@opensumi/ide-core-browser/lib/bootstrap/app';
@@ -52,6 +54,7 @@ import { DesignModule } from '@opensumi/ide-design/lib/browser';
 import { DESIGN_MENUBAR_CONTAINER_VIEW_ID } from '@opensumi/ide-design/lib/common/constants';
 import { CoreBrowserModule, ELECTRON_HEADER } from '@/core/browser';
 import { AutoUpdaterModule } from '@/auto-updater/browser'
+import { getStartupTiming } from '@/core/common/startup-timing'
 
 // 临时修复 bash 打开 -l 参数不支持导致报错的问题
 terminalPreferenceSchema.properties['terminal.integrated.shellArgs.osx'].default = [];
@@ -146,6 +149,8 @@ const layoutConfig: LayoutConfig = {
 renderApp();
 
 async function renderApp() {
+  const timing = getStartupTiming('renderer', console);
+  timing.mark('renderApp.begin');
   const opts: IClientAppOpts = {
     appName: 'OptiCode IDE',
     modules,
@@ -172,10 +177,31 @@ async function renderApp() {
   }
 
   const app = new ClientApp(opts);
+  timing.mark('clientApp.created');
+
+  const notifySplashReady = () => {
+    if (!electronEnv.isElectronRenderer) return;
+    const ipc = (electronEnv as any).ipcRenderer || (window as any).require?.('electron')?.ipcRenderer;
+    if (!ipc) return;
+    ipc.send('opticode:splash-ready', { windowId: electronEnv.currentWindowId });
+  };
+
+  const eventBus = app.injector.get(IEventBus);
+  let splashNotified = false;
+  const splashDisposable = eventBus.on(RenderedEvent, () => {
+    if (splashNotified) return;
+    splashNotified = true;
+    notifySplashReady();
+    splashDisposable.dispose();
+  });
 
   app.fireOnReload = () => {
     app.injector.get(IElectronMainLifeCycleService).reloadWindow(electronEnv.currentWindowId);
   };
 
-  app.start(document.getElementById('main')!, 'electron');
+  timing.mark('clientApp.start.begin');
+  const startPromise = app.start(document.getElementById('main')!, 'electron');
+  startPromise
+    .then(() => timing.mark('clientApp.started'))
+    .catch(() => timing.mark('clientApp.start.error'));
 }
