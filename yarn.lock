@@ -11373,6 +11373,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nsfw@patch:nsfw@npm%3A2.2.0#~/.yarn/patches/nsfw-npm-2.2.0-a584b090a0.patch":
+  version: 2.2.0
+  resolution: "nsfw@patch:nsfw@npm%3A2.2.0#~/.yarn/patches/nsfw-npm-2.2.0-a584b090a0.patch::version=2.2.0&hash=77848f"
+  dependencies:
+    node-addon-api: "npm:*"
+    node-gyp: "npm:latest"
+  checksum: 10/6350672a593a9d6b10f0d583d4c642bee4ea6f2c2f2f92a3af6f4c651d0927de5446278cb2ed950cb22553d0a6279f742e50ab4c05956ed014d1672dae9c69b1
+  languageName: node
+  linkType: hard
+
 "nth-check@npm:^2.0.1":
   version: 2.1.1
   resolution: "nth-check@npm:2.1.1"

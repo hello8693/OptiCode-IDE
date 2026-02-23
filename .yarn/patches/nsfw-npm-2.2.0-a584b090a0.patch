@@ -1,0 +1,109 @@
+diff --git a/includes/win32/Watcher.h b/includes/win32/Watcher.h
+index 165155757a92fe98cea4f2d4b6b772d5d0d34cf1..1eaf4fc9c37423fa513e4ea5d7acf7efcde8367c 100644
+--- a/includes/win32/Watcher.h
++++ b/includes/win32/Watcher.h
+@@ -3,63 +3,62 @@
+ 
+ #include <WinSock2.h>
+ #include <Windows.h>
+-#include <string>
+-#include <mutex>
+ #include <atomic>
++#include <mutex>
++#include <string>
+ #include <thread>
+ 
+-#include "../SingleshotSemaphore.h"
+ #include "../Queue.h"
++#include "../SingleshotSemaphore.h"
+ 
+-class Watcher
+-{
+-  public:
+-    Watcher(std::shared_ptr<EventQueue> queue, const std::wstring &path, bool pathWasNtPrefixed,
+-      const std::vector<std::wstring> &excludedPaths);
+-    ~Watcher();
++class Watcher {
++public:
++  Watcher(std::shared_ptr<EventQueue> queue, const std::wstring &path,
++          bool pathWasNtPrefixed,
++          const std::vector<std::wstring> &excludedPaths);
++  ~Watcher();
+ 
+-    bool isRunning() const { return mRunning; }
+-    std::string getError();
++  bool isRunning() const { return mRunning; }
++  std::string getError();
+ 
+-  private:
+-    void run();
+-    bool pollDirectoryChanges();
+-    void start();
+-    void stop();
++private:
++  void run();
++  bool pollDirectoryChanges();
++  void start();
++  void stop();
+ 
+-    void setError(const std::string &error);
+-    void eventCallback(DWORD errorCode);
+-    void handleEvents();
+-    void reopenWathedFolder();
+-    HANDLE openDirectory(const std::wstring &path);
++  void setError(const std::string &error);
++  void eventCallback(DWORD errorCode);
++  void handleEvents();
++  void reopenWathedFolder();
++  HANDLE openDirectory(const std::wstring &path);
+ 
+-    void resizeBuffers(std::size_t size);
++  void resizeBuffers(std::size_t size);
+ 
+-    std::string getUTF8Directory(std::wstring path) ;
+-    bool Watcher::isExcluded(const std::wstring &fileName);
++  std::string getUTF8Directory(std::wstring path);
++  bool isExcluded(const std::wstring &fileName);
+ 
+-    std::wstring Watcher::getWatchedPathFromHandle();
+-    void Watcher::checkWatchedPath();
++  std::wstring getWatchedPathFromHandle();
++  void checkWatchedPath();
+ 
+-    std::atomic<bool> mRunning;
+-    SingleshotSemaphore mHasStartedSemaphore;
+-    SingleshotSemaphore mIsRunningSemaphore;
+-    mutable std::mutex mErrorMutex;
+-    mutable std::mutex mHandleMutex;
+-    std::string mError;
+-    std::wstring mWatchedPath;
++  std::atomic<bool> mRunning;
++  SingleshotSemaphore mHasStartedSemaphore;
++  SingleshotSemaphore mIsRunningSemaphore;
++  mutable std::mutex mErrorMutex;
++  mutable std::mutex mHandleMutex;
++  std::string mError;
++  std::wstring mWatchedPath;
+ 
+-    const std::wstring mPath;
+-    std::shared_ptr<EventQueue> mQueue;
+-    HANDLE mDirectoryHandle;
+-    bool mPathWasNtPrefixed;
+-    const std::vector<std::wstring> mExcludedPaths;
++  const std::wstring mPath;
++  std::shared_ptr<EventQueue> mQueue;
++  HANDLE mDirectoryHandle;
++  bool mPathWasNtPrefixed;
++  const std::vector<std::wstring> mExcludedPaths;
+ 
+-    std::vector<BYTE> mReadBuffer, mWriteBuffer;
+-    OVERLAPPED mOverlapped;
++  std::vector<BYTE> mReadBuffer, mWriteBuffer;
++  OVERLAPPED mOverlapped;
+ 
+-    std::thread mRunner;
++  std::thread mRunner;
+ };
+ 
+-
+ #endif
