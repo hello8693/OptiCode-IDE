@@ -1,5 +1,7 @@
 import http from 'node:http';
 import fs from 'node:fs/promises';
+import path from 'node:path';
+import { randomUUID } from 'node:crypto';
 import { Injectable, Autowired } from '@opensumi/di';
 import { ILogService } from '@/logger/common';
 import {
@@ -9,6 +11,8 @@ import {
   COMPETITIVE_COMPANION_LAST_WORKSPACE_KEY,
   DEFAULT_COMPETITIVE_COMPANION_SETTINGS,
   CompetitiveCompanionSettings,
+  CompetitiveCompanionImportEvent,
+  ICompetitiveCompanionBridge,
 } from '@/core/common/competitive-companion';
 import { CompetitiveCompanionService } from './competitive-companion.service';
 
@@ -21,6 +25,9 @@ export class CompetitiveCompanionServer {
 
   @Autowired(CompetitiveCompanionService)
   private readonly companionService: CompetitiveCompanionService;
+
+  @Autowired(ICompetitiveCompanionBridge)
+  private readonly companionBridge: ICompetitiveCompanionBridge;
 
   private server?: http.Server;
   private port?: number;
@@ -108,6 +115,15 @@ export class CompetitiveCompanionServer {
 
     try {
       const result = await this.companionService.importProblem(payload, workspaceDir);
+      const sourcePath = path.join(result.rootDir, `${result.id}.cpp`);
+      const event: CompetitiveCompanionImportEvent = {
+        eventId: randomUUID(),
+        problemId: result.id,
+        workspaceDir,
+        sourcePath,
+        createdAt: Date.now(),
+      };
+      await this.companionBridge.reportImport(event);
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ status: 'ok', id: result.id, rootDir: result.rootDir }));
     } catch (err: any) {

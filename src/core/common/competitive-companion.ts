@@ -30,3 +30,26 @@ export const DEFAULT_COMPETITIVE_COMPANION_SETTINGS: CompetitiveCompanionSetting
   enabled: true,
   ports: DEFAULT_COMPETITIVE_COMPANION_PORTS,
 };
+
+export interface CompetitiveCompanionImportEvent {
+  eventId: string;
+  problemId: string;
+  workspaceDir: string;
+  sourcePath: string;
+  createdAt: number;
+}
+
+export const ICompetitiveCompanionImportClient = Symbol('ICompetitiveCompanionImportClient');
+
+export interface ICompetitiveCompanionImportClient {
+  onDidImport(event: CompetitiveCompanionImportEvent): void;
+}
+
+export const CompetitiveCompanionBridgePath = 'CompetitiveCompanionBridgePath';
+export const ICompetitiveCompanionBridge = Symbol('ICompetitiveCompanionBridge');
+
+export interface ICompetitiveCompanionBridge {
+  reportImport(event: CompetitiveCompanionImportEvent): Promise<void>;
+  getPendingImport(): Promise<CompetitiveCompanionImportEvent | undefined>;
+  clearPendingImport(eventId: string): Promise<void>;
+}
