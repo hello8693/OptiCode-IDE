@@ -24,13 +24,14 @@ import {
 } from 'tdesign-icons-react';
 import { IProblemService, IProblem } from '../../common/problem';
 import { IProblemAssetService, ProblemAssets, FileItem } from '../../common/problem-assets';
-import { SINGLEFILE_CREATE_CMD, SINGLEFILE_OPEN_META_CMD } from '../compile-run/contribution';
+import { SINGLEFILE_CREATE_CMD } from './commands.contribution';
+import { SINGLEFILE_OPEN_META_CMD } from '../problem-meta/contribution';
 import { ISampleCase, isLargeSample, sampleDisplayLabel, sampleFileName } from '../../common/sample-data';
 
 import '../styles/oi-panel.less';
 import '../styles/problem-tree.less';
-import { useVisibilityInterval } from '../hooks/useVisibilityInterval';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { ProblemWorkspaceStateService } from '../services/problem-workspace-state.service';
 
 export const PROBLEM_LIST_PANEL = 'problem-list-panel';
 export const PROBLEM_LIST_CONTAINER = 'problem-list-container';
@@ -45,27 +46,6 @@ const SECTION_LABELS: Record<TreeSection, string> = {
 };
 
 const SECTIONS: TreeSection[] = ['source', 'samples', 'solutions', 'others'];
-
-const buildProblemSig = (list: IProblem[]) => {
-  return list
-    .map(p => `${p.meta.id}|${p.meta.updatedAt || ''}|${p.meta.name || ''}|${p.meta.source?.oj || ''}`)
-    .join(';;');
-};
-
-const buildAssetsSig = (assets: Record<string, ProblemAssets>) => {
-  const ids = Object.keys(assets).sort();
-  const parts: string[] = [];
-  for (const id of ids) {
-    const item = assets[id];
-    if (!item) continue;
-    for (const section of SECTIONS) {
-      const files = item[section] || [];
-      const fileSig = files.map(f => `${f.path}|${f.isDirectory ? 1 : 0}`).join(',');
-      parts.push(`${id}:${section}:${files.length}:${fileSig}`);
-    }
-  }
-  return parts.join(';;');
-};
 
 interface ProblemNodeProps {
   problem: IProblem;
@@ -206,29 +186,26 @@ export const ProblemListPanel: React.FC = () => {
   const commandService = useInjectable<CommandService>(CommandService);
   const editorService = useInjectable<WorkbenchEditorService>(WorkbenchEditorService);
   const assetService = useInjectable<IProblemAssetService>(IProblemAssetService);
+  const workspaceState = useInjectable<ProblemWorkspaceStateService>(ProblemWorkspaceStateService);
 
-  const [problems, setProblems] = useState<IProblem[]>([]);
-  const [assets, setAssets] = useState<Record<string, ProblemAssets>>({});
+  const initialSnapshot = workspaceState.getSnapshot();
+  const [problems, setProblems] = useState<IProblem[]>(initialSnapshot.problems);
+  const [assets, setAssets] = useState<Record<string, ProblemAssets>>(initialSnapshot.assets);
   const [loading, setLoading] = useState(false);
   const [hasWorkspace, setHasWorkspace] = useState(true);
-  const [workspaceSupported, setWorkspaceSupported] = useState(true);
+  const [workspaceSupported, setWorkspaceSupported] = useState(initialSnapshot.workspaceSupported);
   const [searchText, setSearchText] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'recent'>('all');
   const [expandedProblems, setExpandedProblems] = useState<Record<string, boolean>>({});
   const [expandedSections, setExpandedSections] = useState<Record<string, Partial<Record<TreeSection, boolean>>>>({});
-  const [lastScanAt, setLastScanAt] = useState<number | null>(null);
-  const [scanDurationMs, setScanDurationMs] = useState<number>(0);
+  const [lastScanAt, setLastScanAt] = useState<number | null>(initialSnapshot.lastScanAt);
+  const [scanDurationMs, setScanDurationMs] = useState<number>(initialSnapshot.scanDurationMs);
   const [activeProblemId, setActiveProblemId] = useState<string | undefined>(problemService.activeProblem?.meta.id);
   const [samplesByProblem, setSamplesByProblem] = useState<Record<string, ISampleCase[]>>({});
   const [samplesLoading, setSamplesLoading] = useState<Record<string, boolean>>({});
 
   const listBodyRef = useRef<HTMLDivElement | null>(null);
   const problemNodeRefs = useRef<Record<string, HTMLDivElement | null>>({});
-  const refreshInFlight = useRef(false);
-  const lastProblemSig = useRef('');
-  const lastAssetsSig = useRef('');
-  const problemsRef = useRef<IProblem[]>([]);
-  const assetsRef = useRef<Record<string, ProblemAssets>>({});
   const samplesLoadingRef = useRef<Record<string, boolean>>({});
   const userCollapsedProblemsRef = useRef<Record<string, boolean>>({});
 
@@ -256,46 +233,39 @@ export const ProblemListPanel: React.FC = () => {
   }, [samplesByProblem, loadSamplesForProblem]);
 
   const refresh = useCallback(async () => {
-    if (refreshInFlight.current) return;
-    refreshInFlight.current = true;
-    const start = Date.now();
     setLoading(true);
     try {
-      const list = await problemService.listProblems();
-      const nextProblemSig = buildProblemSig(list);
-      if (nextProblemSig !== lastProblemSig.current) {
-        setProblems(list);
-        problemsRef.current = list;
-        lastProblemSig.current = nextProblemSig;
-      }
-
-      const nextAssets = await assetService.listAssetsForProblems(list);
-      const nextAssetsSig = buildAssetsSig(nextAssets);
-      if (nextAssetsSig !== lastAssetsSig.current) {
-        setAssets(nextAssets);
-        assetsRef.current = nextAssets;
-        lastAssetsSig.current = nextAssetsSig;
-      }
-
-      if (list.length > 0) {
-        setWorkspaceSupported(true);
-      } else if (problemsRef.current.length === 0) {
-        const supported = await problemService.isOptiCodeWorkspace();
-        setWorkspaceSupported(prev => (prev === supported ? prev : supported));
-      }
-      setLastScanAt(Date.now());
-      setScanDurationMs(Date.now() - start);
-      const activeId = problemService.activeProblem?.meta.id;
-      if (activeId) {
-        void loadSamplesForProblem(activeId);
-      }
-    } catch {
-      // keep last known data to avoid flicker on transient errors
+      await workspaceState.refresh();
     } finally {
       setLoading(false);
-      refreshInFlight.current = false;
     }
-  }, [problemService, assetService, loadSamplesForProblem]);
+  }, [workspaceState]);
+
+  useEffect(() => {
+    const snapshot = workspaceState.getSnapshot();
+    setProblems(snapshot.problems);
+    setAssets(snapshot.assets);
+    setWorkspaceSupported(snapshot.workspaceSupported);
+    setLastScanAt(snapshot.lastScanAt);
+    setScanDurationMs(snapshot.scanDurationMs);
+    const disposable = workspaceState.onDidChange((next) => {
+      setProblems(next.problems);
+      setAssets(next.assets);
+      setWorkspaceSupported(next.workspaceSupported);
+      setLastScanAt(next.lastScanAt);
+      setScanDurationMs(next.scanDurationMs);
+    });
+    return () => disposable.dispose();
+  }, [workspaceState]);
+
+  useEffect(() => {
+    if (!activeProblemId) return;
+    void loadSamplesForProblem(activeProblemId);
+  }, [activeProblemId, lastScanAt, loadSamplesForProblem]);
+
+  useEffect(() => {
+    void workspaceState.ensureInitialized();
+  }, [workspaceState]);
 
   const sampleNameCollator = useMemo(
     () => new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }),
@@ -347,22 +317,13 @@ export const ProblemListPanel: React.FC = () => {
     const checkRoots = async () => {
       const roots = await workspaceService.roots;
       setHasWorkspace(!!roots.length);
-      if (roots.length) {
-        refresh();
-      } else {
-        setWorkspaceSupported(true);
-      }
     };
     checkRoots();
-  }, [workspaceService, refresh]);
-
-  useVisibilityInterval(refresh, { intervalMs: 5000, immediate: false, enabled: !electronEnv.isElectronRenderer });
-
-  useEffect(() => {
-    if (!electronEnv.isElectronRenderer) return;
-    const timer = setInterval(refresh, 5000);
-    return () => clearInterval(timer);
-  }, [refresh]);
+    const disposable = workspaceService.onWorkspaceChanged((roots) => {
+      setHasWorkspace(!!roots.length);
+    });
+    return () => disposable.dispose();
+  }, [workspaceService]);
 
   const openProblemSource = useCallback(async (problem: IProblem) => {
     await editorService.open(URI.file(problem.sourcePath), { preview: false });

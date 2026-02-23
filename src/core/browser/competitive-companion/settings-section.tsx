@@ -1,6 +1,6 @@
 import React from 'react';
 import { useInjectable, CommandService } from '@opensumi/ide-core-browser';
-import { OPEN_COMPETITIVE_COMPANION_SETTINGS_CMD } from '../compile-run/contribution';
+import { OPEN_COMPETITIVE_COMPANION_SETTINGS_CMD } from './settings.contribution';
 import '../styles/cpp-settings.less';
 
 export const CompetitiveCompanionSettingsSection: React.FC = () => {

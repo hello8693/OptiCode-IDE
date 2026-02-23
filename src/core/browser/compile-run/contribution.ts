@@ -20,7 +20,6 @@ import {
   EditorOpenType,
 } from '@opensumi/ide-editor/lib/browser';
 import { IResource, ResourceService } from '@opensumi/ide-editor';
-import { IQuickInputService } from '@opensumi/ide-core-browser/lib/quick-open';
 import { IFileServiceClient } from '@opensumi/ide-file-service';
 import { WorkbenchEditorService } from '@opensumi/ide-editor/lib/browser';
 import { IWorkspaceService } from '@opensumi/ide-workspace/lib/common';
@@ -30,18 +29,15 @@ import { DebugConfiguration, DebugState, IDebugSessionManager } from '@opensumi/
 import { DebugConfigurationManager } from '@opensumi/ide-debug/lib/browser/debug-configuration-manager';
 import { IEditorDocumentModelService } from '@opensumi/ide-editor/lib/browser';
 
-import { STD_KEY, STD_OPTIONS, STD_DEFAULT, OPT_KEY, OPT_OPTIONS, CPP_PREFERENCE_IDS } from '../cpp/constants';
+import { STD_KEY, STD_OPTIONS, STD_DEFAULT, CPP_PREFERENCE_IDS } from '../cpp/constants';
 import { CPP_TEMPLATE_STORAGE_KEY, DEFAULT_CPP_TEMPLATE } from '../../common/templates';
 import { SCRATCHPAD_SCHEME, ScratchpadEntry } from '../../common/scratchpad';
 import { ScratchpadService } from '../scratchpad/scratchpad.service';
-import { CompetitiveCompanionSettingsEditor } from '../competitive-companion/settings.editor';
 import { IStorageService, ISystemPathService, SystemPathServicePath } from '../../common';
 import { IProblem, IProblemService } from '../../common/problem';
-import { CompileRunPanel, COMPILE_RUN_PANEL } from './view';
-import { SampleTestPanel, SAMPLE_TEST_PANEL, SAMPLE_TEST_CONTAINER } from '../sample-test/view';
+import { CompileRunPanel } from './view';
 import { CppSettingsEditor } from './settings.editor';
 import { CppTemplateEditor } from './template.editor';
-import { ProblemMetaEditor } from '../problem-meta/editor';
 
 export const SINGLE_FILE_FLAGS_KEY = 'singlefile.cpp.flags';
 
@@ -56,23 +52,17 @@ export const COMMON_FLAGS = [
   { label: '-DLOCAL', value: '-DLOCAL', desc: '定义 LOCAL 宏' },
 ];
 
-export const SINGLEFILE_CREATE_CMD = 'singlefile.cpp.createProblem';
 export const SINGLEFILE_COMPILE_CMD = 'singlefile.cpp.compile';
 export const SINGLEFILE_RUN_CMD = 'singlefile.cpp.run';
 export const SINGLEFILE_COMPILE_RUN_CMD = 'singlefile.cpp.compileAndRun';
 export const SINGLEFILE_DEBUG_CMD = 'singlefile.cpp.debug';
 export const SINGLEFILE_OPEN_SETTINGS_CMD = 'singlefile.cpp.openSettings';
 export const SINGLEFILE_OPEN_TEMPLATE_CMD = 'singlefile.cpp.openTemplate';
-export const SINGLEFILE_OPEN_META_CMD = 'singlefile.cpp.openMeta';
-export const OPEN_COMPETITIVE_COMPANION_SETTINGS_CMD = 'competitiveCompanion.openSettings';
 export const COMPILE_RUN_CONTAINER = 'compile-run-container';
 export const CPP_SETTINGS_SCHEME = 'cpp-settings';
 export const CPP_SETTINGS_URI = `${CPP_SETTINGS_SCHEME}://panel`;
 export const CPP_TEMPLATE_SCHEME = 'cpp-template';
 export const CPP_TEMPLATE_URI = `${CPP_TEMPLATE_SCHEME}://panel`;
-export const COMPETITIVE_COMPANION_SETTINGS_SCHEME = 'competitive-companion-settings';
-export const COMPETITIVE_COMPANION_SETTINGS_URI = `${COMPETITIVE_COMPANION_SETTINGS_SCHEME}://panel`;
-export const PROBLEM_META_SCHEME = 'problem-meta';
 
 function stdToFlag(std: string): string {
   switch (std) {
@@ -122,9 +112,6 @@ export class CompileRunContribution
 
   @Autowired(SystemPathServicePath)
   private readonly systemPathService: ISystemPathService;
-
-  @Autowired(IQuickInputService)
-  private readonly quickInput: IQuickInputService;
 
   @Autowired(PreferenceService)
   private readonly preferenceService: PreferenceService;
@@ -205,14 +192,6 @@ export class CompileRunContribution
       component: CompileRunPanel,
       priority: 8,
     });
-
-    registry.register(SAMPLE_TEST_CONTAINER, [], {
-      containerId: SAMPLE_TEST_CONTAINER,
-      iconClass: getIcon('test'),
-      title: '自测',
-      component: SampleTestPanel,
-      priority: 7,
-    });
   }
 
   registerEditorComponent(registry: EditorComponentRegistry) {
@@ -230,27 +209,6 @@ export class CompileRunContribution
       renderMode: EditorComponentRenderMode.ONE_PER_WORKBENCH,
     });
 
-    registry.registerEditorComponent({
-      uid: 'sample-editor',
-      scheme: 'file',
-      component: SampleTestPanel,
-      renderMode: EditorComponentRenderMode.ONE_PER_WORKBENCH,
-    });
-
-    registry.registerEditorComponent({
-      uid: 'competitive-companion-settings',
-      scheme: COMPETITIVE_COMPANION_SETTINGS_SCHEME,
-      component: CompetitiveCompanionSettingsEditor,
-      renderMode: EditorComponentRenderMode.ONE_PER_WORKBENCH,
-    });
-
-    registry.registerEditorComponent({
-      uid: 'problem-meta-editor',
-      scheme: PROBLEM_META_SCHEME,
-      component: ProblemMetaEditor,
-      renderMode: EditorComponentRenderMode.ONE_PER_WORKBENCH,
-    });
-
     registry.registerEditorComponentResolver(CPP_SETTINGS_SCHEME, (resource, results) => {
       results.push({ type: EditorOpenType.component, componentId: 'cpp-settings-editor' });
     });
@@ -259,21 +217,6 @@ export class CompileRunContribution
       results.push({ type: EditorOpenType.component, componentId: 'cpp-template-editor' });
     });
 
-    registry.registerEditorComponentResolver(COMPETITIVE_COMPANION_SETTINGS_SCHEME, (resource, results) => {
-      results.push({ type: EditorOpenType.component, componentId: 'competitive-companion-settings' });
-    });
-
-    registry.registerEditorComponentResolver('file', (resource, results) => {
-      const fsPath = resource?.uri?.codeUri?.fsPath;
-      if (!fsPath) return;
-      if (this.isSamplesJsonPath(fsPath)) {
-        results.unshift({ type: EditorOpenType.component, componentId: 'sample-editor' });
-      }
-    });
-
-    registry.registerEditorComponentResolver(PROBLEM_META_SCHEME, (resource, results) => {
-      results.push({ type: EditorOpenType.component, componentId: 'problem-meta-editor' });
-    });
   }
 
   registerResource(service: ResourceService) {
@@ -295,30 +238,9 @@ export class CompileRunContribution
       }),
     });
 
-    service.registerResourceProvider({
-      scheme: COMPETITIVE_COMPANION_SETTINGS_SCHEME,
-      provideResource: async (uri: URI): Promise<IResource> => ({
-        uri,
-        name: localize('competitive.companion.settings.title', 'Competitive Companion 设置'),
-        icon: getIcon('setting'),
-      }),
-    });
-
-    service.registerResourceProvider({
-      scheme: PROBLEM_META_SCHEME,
-      provideResource: async (uri: URI): Promise<IResource> => ({
-        uri,
-        name: localize('problem.meta.title', '题目元信息'),
-        icon: getIcon('setting'),
-      }),
-    });
   }
 
   registerCommands(registry: CommandRegistry) {
-    registry.registerCommand(
-      { id: SINGLEFILE_CREATE_CMD, label: '新建题目' },
-      { execute: () => this.createProblem() },
-    );
     registry.registerCommand(
       { id: SINGLEFILE_COMPILE_CMD, label: '编译当前题目' },
       { execute: () => this.compileCurrentFile() },
@@ -347,36 +269,20 @@ export class CompileRunContribution
       { id: SINGLEFILE_OPEN_TEMPLATE_CMD, label: '打开源码模板' },
       { execute: () => this.openCppTemplate() },
     );
-    registry.registerCommand(
-      { id: OPEN_COMPETITIVE_COMPANION_SETTINGS_CMD, label: 'Competitive Companion 设置' },
-      { execute: () => this.openCompetitiveCompanionSettings() },
-    );
-    registry.registerCommand(
-      { id: SINGLEFILE_OPEN_META_CMD, label: '编辑题目信息' },
-      {
-        execute: async (id?: string) => {
-          const targetId = id || this.problemService.activeProblem?.meta.id;
-          if (!targetId) {
-            this.messageService.warning('请先打开一道题目');
-            return;
-          }
-          await this.editorService.open(new URI(`${PROBLEM_META_SCHEME}://${targetId}`), { preview: false });
-        },
-      },
-    );
   }
 
   async onStart() {
     if ((this.problemService as any).refreshActiveProblem) {
-      await (this.problemService as any).refreshActiveProblem();
+      void (this.problemService as any).refreshActiveProblem();
     }
     this.editorService.onActiveResourceChange(async () => {
       if ((this.problemService as any).refreshActiveProblem) {
-        await (this.problemService as any).refreshActiveProblem();
+        void (this.problemService as any).refreshActiveProblem();
       }
     });
 
     this.registerCppDebugSupport();
+    void this.getFlags();
     const revealTerminal = (session: any) => {
       if (!session?.configuration) return;
       if (session.configuration.type !== 'cppdbg') return;
@@ -446,10 +352,6 @@ export class CompileRunContribution
     await this.editorService.open(URI.file(templatePath), { preview: false });
   }
 
-  private async openCompetitiveCompanionSettings(): Promise<void> {
-    await this.editorService.open(new URI(COMPETITIVE_COMPANION_SETTINGS_URI), { preview: false });
-  }
-
   private async getStd(): Promise<string> {
     const normalizeStd = (val: string | undefined): string => {
       if (STD_OPTIONS.includes(val || '')) return val as string;
@@ -464,9 +366,14 @@ export class CompileRunContribution
 
   private async getFlags(): Promise<string[]> {
     const pref = this.preferenceService.getValid(CPP_PREFERENCE_IDS.flags, undefined as any);
-    if (Array.isArray(pref)) return pref as string[];
+    if (Array.isArray(pref) && pref.length) return pref as string[];
     const saved = await this.storage.getItem<string[]>(SINGLE_FILE_FLAGS_KEY);
-    return saved || ['-O2', '-Wall'];
+    if (Array.isArray(saved) && saved.length) {
+      await this.preferenceService.update(CPP_PREFERENCE_IDS.flags, saved);
+      this.storage.removeItem(SINGLE_FILE_FLAGS_KEY);
+      return saved;
+    }
+    return ['-O2', '-Wall'];
   }
 
   private async getRootPath(): Promise<string | undefined> {
@@ -533,12 +440,6 @@ export class CompileRunContribution
       this.cachedPlatform = await this.systemPathService.getPlatform();
     }
     return this.cachedPlatform;
-  }
-
-  private isSamplesJsonPath(fsPath: string): boolean {
-    if (!fsPath) return false;
-    const normalized = fsPath.replace(/\\/g, '/');
-    return /\/samples\/samples\.json$/i.test(normalized);
   }
 
   /** 确保二进制输出目录存在 */
@@ -650,36 +551,6 @@ export class CompileRunContribution
     });
 
     return { exitCode: undefined, clientId: client.id };
-  }
-
-  private async createProblem() {
-    const rootPath = await this.getRootPath();
-    if (!rootPath) {
-      this.messageService.warning('请先打开文件夹');
-      return;
-    }
-
-    const name = await this.quickInput.open({
-      prompt: '请输入题目名（将创建同名文件夹，如 P1001）',
-      value: 'P1001',
-      placeHolder: '例如: P1001、A、solution',
-    });
-
-    if (!name) return;
-
-    const sanitized = name.replace(/\.(cpp|cc|cxx|c)$/i, '').replace(/[\/\\]/g, '');
-    if (!sanitized) {
-      this.messageService.warning('题目名不合法');
-      return;
-    }
-
-    try {
-      const problem = await this.problemService.createProblem(sanitized);
-      await this.editorService.open(new URI(`file://${problem.sourcePath}`));
-      this.messageService.info(`题目 ${sanitized} 创建成功`);
-    } catch (err: any) {
-      this.messageService.error(`创建失败: ${err.message || err}`);
-    }
   }
 
   async compileCurrentFile(): Promise<boolean> {

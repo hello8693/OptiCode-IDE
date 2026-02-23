@@ -4,7 +4,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CommandService, URI, useInjectable, electronEnv } from '@opensumi/ide-core-browser';
 import { WorkbenchEditorService } from '@opensumi/ide-editor/lib/browser';
-import { IWorkspaceService } from '@opensumi/ide-workspace/lib/common';
 import {
   TaskIcon as TestIcon,
   CodeIcon,
@@ -25,7 +24,7 @@ import { ISampleCase, ISampleResult, Verdict, isLargeSample, sampleDisplayLabel,
 import { SINGLEFILE_COMPILE_CMD } from '../compile-run/contribution';
 
 import '../styles/oi-panel.less';
-import { useVisibilityInterval } from '../hooks/useVisibilityInterval';
+import { ProblemWorkspaceStateService } from '../services/problem-workspace-state.service';
 
 export const SAMPLE_TEST_PANEL = 'sample-test-panel';
 export const SAMPLE_TEST_CONTAINER = 'sample-test-container';
@@ -154,7 +153,7 @@ export const SampleTestPanel: React.FC = () => {
   const editorService = useInjectable<WorkbenchEditorService>(WorkbenchEditorService);
   const problemService = useInjectable<IProblemService>(IProblemService);
   const judgeService = useInjectable<IJudgeService>(IJudgeService);
-  const workspaceService = useInjectable<IWorkspaceService>(IWorkspaceService);
+  const workspaceState = useInjectable<ProblemWorkspaceStateService>(ProblemWorkspaceStateService);
 
   const [activeProblem, setActiveProblem] = useState<IProblem | undefined>(
     problemService.activeProblem,
@@ -163,7 +162,9 @@ export const SampleTestPanel: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<Record<string, ISampleResult>>({});
-  const [workspaceSupported, setWorkspaceSupported] = useState<boolean>(true);
+  const [workspaceSupported, setWorkspaceSupported] = useState<boolean>(
+    workspaceState.getSnapshot().workspaceSupported,
+  );
 
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastLoadedId = useRef<string>('');
@@ -214,37 +215,12 @@ export const SampleTestPanel: React.FC = () => {
     return () => disposable.dispose();
   }, [problemService, loadCases]);
 
-  const updateSupport = useCallback(async () => {
-    const roots = await workspaceService.roots;
-    if (!roots.length) return;
-    if (activeProblem) {
-      setWorkspaceSupported(true);
-      return;
-    }
-    const supported = await problemService.isOptiCodeWorkspace();
-    if (isElectron) {
-      setWorkspaceSupported(supported);
-    } else {
-      setWorkspaceSupported(prev => (prev === supported ? prev : supported));
-    }
-  }, [workspaceService, problemService, activeProblem, isElectron]);
-
   useEffect(() => {
-    let disposed = false;
-    const guarded = async () => {
-      if (disposed) return;
-      await updateSupport();
-    };
-    void guarded();
-    if (!isElectron) return () => { disposed = true; };
-    const timer = setInterval(guarded, 5000);
-    return () => {
-      disposed = true;
-      clearInterval(timer);
-    };
-  }, [updateSupport, isElectron]);
-
-  useVisibilityInterval(updateSupport, { intervalMs: 5000, immediate: false, enabled: !isElectron });
+    const disposable = workspaceState.onDidChange((snapshot) => {
+      setWorkspaceSupported(snapshot.workspaceSupported);
+    });
+    return () => disposable.dispose();
+  }, [workspaceState]);
 
   /* ── 防抖自动保存 ── */
   const scheduleSave = useCallback((problemId: string, nextCases: ISampleCase[]) => {
@@ -428,7 +404,9 @@ export const SampleTestPanel: React.FC = () => {
   }, [activeProblem, commandService, runCase]);
 
   /* ── 无活动题目 ── */
-  if (!workspaceSupported) {
+  const effectiveWorkspaceSupported = activeProblem ? true : workspaceSupported;
+
+  if (!effectiveWorkspaceSupported) {
     return (
       <div className="oi-panel">
         <div className="oi-panel__header">

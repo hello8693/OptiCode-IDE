@@ -19,6 +19,7 @@ import { IWorkspaceService } from '@opensumi/ide-workspace/lib/common';
 
 import { CPP_PREFERENCE_IDS, STD_DEFAULT } from '../cpp/constants';
 import { ISystemPathService, SystemPathServicePath } from '../../common';
+import { IProblemService } from '../../common/problem';
 
 /** compile_commands.json 中的一条记录 */
 interface CompileEntry {
@@ -52,12 +53,17 @@ export class ClangdConfigService implements ClientAppContribution {
   @Autowired(SystemPathServicePath)
   private readonly systemPathService: ISystemPathService;
 
+  @Autowired(IProblemService)
+  private readonly problemService: IProblemService;
+
   private debounceTimer: ReturnType<typeof setTimeout> | undefined;
   private cachedPlatform?: string;
 
-  async onStart() {
-    // 首次生成
-    await this.maybeGenerateAll();
+  onStart() {
+    // 首次生成：延后到空闲时执行，避免阻塞首屏
+    this.scheduleIdle(() => {
+      void this.maybeGenerateAll();
+    }, 1200);
 
     // 当 C++ 偏好变更时，重新生成 compile_commands.json
     this.preferenceService.onSpecificPreferenceChange(CPP_PREFERENCE_IDS.std, () => {
@@ -380,6 +386,21 @@ Standard: c++20
   // ─── File utilities ─────────────────────────────────────────────
 
   private async findCppFiles(root: string): Promise<string[]> {
+    try {
+      const problems = await this.problemService.listProblems();
+      if (problems.length) {
+        const files = problems
+          .map(p => p.sourcePath)
+          .filter(Boolean)
+          .filter(p => CPP_EXTENSIONS.has(this.extname(p)));
+        if (files.length) {
+          return files;
+        }
+      }
+    } catch {
+      // fallback to full scan
+    }
+
     const results: string[] = [];
     await this.walkDir(root, results, 0);
     return results;
@@ -430,5 +451,13 @@ Standard: c++20
       case 'C++23': return '-std=c++23';
       default: return '-std=c++14';
     }
+  }
+
+  private scheduleIdle(task: () => void, delay = 1000) {
+    if (typeof (window as any).requestIdleCallback === 'function') {
+      (window as any).requestIdleCallback(() => task(), { timeout: delay });
+      return;
+    }
+    window.setTimeout(task, delay);
   }
 }

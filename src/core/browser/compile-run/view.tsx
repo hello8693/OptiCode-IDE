@@ -2,7 +2,7 @@
  * 「编译与运行」侧栏面板 —— 题目级编译运行工具
  */
 import React, { useCallback, useState, useEffect } from 'react';
-import { CommandService, useInjectable, electronEnv } from '@opensumi/ide-core-browser';
+import { CommandService, useInjectable, PreferenceService } from '@opensumi/ide-core-browser';
 import { WorkbenchEditorService } from '@opensumi/ide-editor/lib/browser';
 import { IWorkspaceService } from '@opensumi/ide-workspace/lib/common';
 import { CheckBox } from '@opensumi/ide-components';
@@ -20,39 +20,36 @@ import {
   SystemStorageIcon,
   TagIcon,
 } from 'tdesign-icons-react';
-import { IStorageService } from '../../common';
 import { IProblemService, IProblem } from '../../common/problem';
 import { SCRATCHPAD_SCHEME, ScratchpadEntry } from '../../common/scratchpad';
 import { TOGGLE_STD } from '../cpp/status.contribution';
-import { STD_KEY, STD_OPTIONS, STD_DEFAULT } from '../cpp/constants';
+import { STD_DEFAULT, CPP_PREFERENCE_IDS } from '../cpp/constants';
 import {
-  SINGLEFILE_CREATE_CMD,
   SINGLEFILE_COMPILE_CMD,
   SINGLEFILE_RUN_CMD,
   SINGLEFILE_COMPILE_RUN_CMD,
   SINGLEFILE_DEBUG_CMD,
   SINGLEFILE_OPEN_SETTINGS_CMD,
   SINGLEFILE_OPEN_TEMPLATE_CMD,
-  SINGLE_FILE_FLAGS_KEY,
   COMMON_FLAGS,
 } from './contribution';
+import { SINGLEFILE_CREATE_CMD } from '../problem-list/commands.contribution';
 import { ScratchpadService } from '../scratchpad/scratchpad.service';
 import '../styles/oi-panel.less';
-import { useVisibilityInterval } from '../hooks/useVisibilityInterval';
+import { ProblemWorkspaceStateService } from '../services/problem-workspace-state.service';
 
 export const COMPILE_RUN_PANEL = 'compile-run-panel';
 
 export const CompileRunPanel: React.FC = () => {
   const commandService = useInjectable<CommandService>(CommandService);
   const workspaceService = useInjectable<IWorkspaceService>(IWorkspaceService);
-  const storage = useInjectable<IStorageService>(IStorageService);
+  const preferenceService = useInjectable<PreferenceService>(PreferenceService);
   const problemService = useInjectable<IProblemService>(IProblemService);
   const editorService = useInjectable<WorkbenchEditorService>(WorkbenchEditorService);
   const scratchService = useInjectable<ScratchpadService>(ScratchpadService);
+  const workspaceState = useInjectable<ProblemWorkspaceStateService>(ProblemWorkspaceStateService);
 
   const exec = useCallback((cmd: string) => commandService.executeCommand(cmd), [commandService]);
-  const isElectron = electronEnv.isElectronRenderer;
-
   const [activeProblem, setActiveProblem] = useState<IProblem | undefined>(
     problemService.activeProblem,
   );
@@ -62,7 +59,9 @@ export const CompileRunPanel: React.FC = () => {
   const [flags, setFlags] = useState<string[]>(['-O2', '-Wall']);
 
   const [hasWorkspace, setHasWorkspace] = useState<boolean>(true);
-  const [workspaceSupported, setWorkspaceSupported] = useState<boolean>(true);
+  const [workspaceSupported, setWorkspaceSupported] = useState<boolean>(
+    workspaceState.getSnapshot().workspaceSupported,
+  );
 
   useEffect(() => {
     const disposable = problemService.onActiveProblemChange(p => {
@@ -102,29 +101,30 @@ export const CompileRunPanel: React.FC = () => {
     };
   }, [editorService, scratchService]);
 
-  const updateConfigs = useCallback(async () => {
-    const s = await storage.getItem<string>(STD_KEY, STD_DEFAULT);
-    const f = await storage.getItem<string[]>(SINGLE_FILE_FLAGS_KEY, ['-O2', '-Wall']);
-    if (isElectron) {
-      setStd(s);
-      setFlags(f);
-      return;
-    }
-    setStd(prev => (prev === s ? prev : s));
-    setFlags(prev => {
-      if (prev.length === f.length && prev.every((v, i) => v === f[i])) return prev;
-      return f;
-    });
-  }, [storage, isElectron]);
-
   useEffect(() => {
-    updateConfigs();
-    if (!isElectron) return;
-    const timer = setInterval(updateConfigs, 2000);
-    return () => clearInterval(timer);
-  }, [updateConfigs, isElectron]);
+    const normalizeFlags = (val: unknown) => (Array.isArray(val) ? (val as string[]) : ['-O2', '-Wall']);
+    const readInitial = () => {
+      const currentStd = preferenceService.getValid(CPP_PREFERENCE_IDS.std, STD_DEFAULT) as string;
+      const currentFlags = normalizeFlags(preferenceService.getValid(CPP_PREFERENCE_IDS.flags, ['-O2', '-Wall']));
+      setStd(currentStd);
+      setFlags(currentFlags);
+    };
+    readInitial();
 
-  useVisibilityInterval(updateConfigs, { intervalMs: 2000, immediate: false, enabled: !isElectron });
+    const disposables = [
+      preferenceService.onSpecificPreferenceChange(CPP_PREFERENCE_IDS.std, change => {
+        if (typeof change?.newValue === 'string') {
+          setStd(change.newValue as string);
+        }
+      }),
+      preferenceService.onSpecificPreferenceChange(CPP_PREFERENCE_IDS.flags, change => {
+        if (Array.isArray(change?.newValue)) {
+          setFlags(change.newValue as string[]);
+        }
+      }),
+    ];
+    return () => disposables.forEach(d => d.dispose());
+  }, [preferenceService]);
 
   useEffect(() => {
     const checkRoots = async () => {
@@ -132,44 +132,23 @@ export const CompileRunPanel: React.FC = () => {
       setHasWorkspace(!!roots.length);
     };
     checkRoots();
+    const disposable = workspaceService.onWorkspaceChanged((roots) => {
+      setHasWorkspace(!!roots.length);
+    });
+    return () => disposable.dispose();
   }, [workspaceService]);
 
-  const updateSupport = useCallback(async () => {
-    const roots = await workspaceService.roots;
-    if (!roots.length) return;
-    if (activeProblem) {
-      setWorkspaceSupported(true);
-      return;
-    }
-    const supported = await problemService.isOptiCodeWorkspace();
-    if (isElectron) {
-      setWorkspaceSupported(supported);
-    } else {
-      setWorkspaceSupported(prev => (prev === supported ? prev : supported));
-    }
-  }, [workspaceService, problemService, activeProblem, isElectron]);
-
   useEffect(() => {
-    let disposed = false;
-    const guarded = async () => {
-      if (disposed) return;
-      await updateSupport();
-    };
-    void guarded();
-    if (!isElectron) return () => { disposed = true; };
-    const timer = setInterval(guarded, 5000);
-    return () => {
-      disposed = true;
-      clearInterval(timer);
-    };
-  }, [updateSupport, isElectron]);
-
-  useVisibilityInterval(updateSupport, { intervalMs: 5000, immediate: false, enabled: !isElectron });
+    const disposable = workspaceState.onDidChange((snapshot) => {
+      setWorkspaceSupported(snapshot.workspaceSupported);
+    });
+    return () => disposable.dispose();
+  }, [workspaceState]);
 
   const toggleFlag = async (f: string) => {
     const newFlags = flags.includes(f) ? flags.filter(x => x !== f) : [...flags, f];
     setFlags(newFlags);
-    await storage.setItem(SINGLE_FILE_FLAGS_KEY, newFlags);
+    await preferenceService.update(CPP_PREFERENCE_IDS.flags, newFlags);
   };
 
   const formatTime = (ts?: number) => {
@@ -182,6 +161,7 @@ export const CompileRunPanel: React.FC = () => {
   const isScratchActive = !!activeScratch;
   const canCompileRun = !!activeProblem || isScratchActive;
   const canDebug = !!activeProblem && !isScratchActive;
+  const effectiveWorkspaceSupported = activeProblem ? true : workspaceSupported;
 
   if (!hasWorkspace && !isScratchActive) {
     return (
@@ -200,7 +180,7 @@ export const CompileRunPanel: React.FC = () => {
     );
   }
 
-  if (!workspaceSupported && !isScratchActive) {
+  if (!effectiveWorkspaceSupported && !isScratchActive) {
     return (
       <div className="oi-panel">
         <div className="oi-panel__header">

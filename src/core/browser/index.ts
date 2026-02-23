@@ -123,3 +123,13 @@ export class CoreBrowserModule extends BrowserModule {
     },
   ];
 }
+import { ProblemCommandContribution } from './problem-list/commands.contribution'
+import { SampleTestContribution } from './sample-test/contribution'
+import { CompetitiveCompanionSettingsContribution } from './competitive-companion/settings.contribution'
+import { ProblemWorkspaceStateService } from './services/problem-workspace-state.service'
+import { ProblemMetaContribution } from './problem-meta/contribution'
+    ProblemCommandContribution,
+    SampleTestContribution,
+    ProblemMetaContribution,
+    CompetitiveCompanionSettingsContribution,
+    ProblemWorkspaceStateService,
