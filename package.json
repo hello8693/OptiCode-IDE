@@ -57,7 +57,7 @@
     "css-loader": "^6",
     "debug": "^4.3.7",
     "electron": "39.0.0",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.27.3",
     "extract-zip": "^2.0.1",
     "fast-glob": "^3.3.2",
     "glob": "^11.0.0",
