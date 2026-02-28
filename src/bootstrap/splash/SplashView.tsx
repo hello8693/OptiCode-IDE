@@ -17,11 +17,11 @@ export const SplashView: React.FC<SplashViewProps> = ({ version, build }) => {
         color1="#5C7CFF"
         color2="#9D5BFF"
         color3="#27C9B8"
-        timeSpeed={0.16}
+        timeSpeed={0.45}
         colorBalance={-0.08}
         warpStrength={0.7}
         warpFrequency={3.2}
-        warpSpeed={1.0}
+        warpSpeed={3.0}
         warpAmplitude={80}
         blendAngle={6}
         blendSoftness={0.14}
@@ -29,7 +29,7 @@ export const SplashView: React.FC<SplashViewProps> = ({ version, build }) => {
         noiseScale={1.4}
         grainAmount={0.05}
         grainScale={2.6}
-        grainAnimated={false}
+        grainAnimated={true}
         contrast={1.15}
         gamma={1.05}
         saturation={0.95}

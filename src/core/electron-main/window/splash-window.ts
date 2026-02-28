@@ -11,10 +11,24 @@ export class SplashWindow {
   private browserWindow: BrowserWindow | null = null;
   private closeTimer: NodeJS.Timeout | null = null;
   private ipcBound = false;
+  private readonly holdSplash = process.env.OPTICODE_SPLASH_HOLD === '1';
+  private holdOverride = false;
 
-  show() {
+  show(options?: { hold?: boolean }) {
+    if (typeof options?.hold === 'boolean') {
+      this.holdOverride = options.hold;
+    } else {
+      this.holdOverride = false;
+    }
+    if (this.shouldHoldSplash() && this.closeTimer) {
+      clearTimeout(this.closeTimer);
+      this.closeTimer = null;
+    }
     if (this.browserWindow && !this.browserWindow.isDestroyed()) {
-      if (typeof (this.browserWindow as any).isReadyToShow === 'function' && (this.browserWindow as any).isReadyToShow()) {
+      if (
+        typeof (this.browserWindow as any).isReadyToShow === 'function' &&
+        (this.browserWindow as any).isReadyToShow()
+      ) {
         this.browserWindow.show();
       }
       return;
@@ -38,11 +52,13 @@ export class SplashWindow {
       // ignore
     } finally {
       this.browserWindow = null;
+      this.holdOverride = false;
     }
   }
 
   private createWindow() {
     this.bindIpcOnce();
+    const isDevServer = Boolean(__SPLASH_WINDOW_DEV_SERVER_URL__);
     const win = new BrowserWindow({
       width: 700,
       height: 420,
@@ -57,8 +73,8 @@ export class SplashWindow {
       backgroundColor: '#0b0c10',
       show: false,
       webPreferences: {
-        nodeIntegration: false,
-        contextIsolation: true,
+        nodeIntegration: isDevServer,
+        contextIsolation: !isDevServer,
         webSecurity: true,
       },
     });
@@ -106,16 +122,28 @@ export class SplashWindow {
       win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(fallbackHtml)}`);
     });
 
+    win.webContents.on('before-input-event', (event, input) => {
+      if (!this.shouldHoldSplash()) return;
+      if (input.type !== 'keyDown') return;
+      const key = (input.key || '').toLowerCase();
+      if (key === 'escape' || key === 'esc' || key === 'q') {
+        event.preventDefault();
+        this.close();
+      }
+    });
+
     win.once('ready-to-show', () => {
       if (!win.isDestroyed()) {
         win.show();
       }
     });
 
-    this.closeTimer = setTimeout(() => {
-      this.revealCodeWindow();
-      this.close();
-    }, 20000);
+    if (!this.shouldHoldSplash()) {
+      this.closeTimer = setTimeout(() => {
+        this.revealCodeWindow();
+        this.close();
+      }, 20000);
+    }
 
     win.on('closed', () => {
       if (this.closeTimer) {
@@ -123,6 +151,7 @@ export class SplashWindow {
         this.closeTimer = null;
       }
       this.browserWindow = null;
+      this.holdOverride = false;
     });
 
     return win;
@@ -135,14 +164,22 @@ export class SplashWindow {
   }
 
   private handleSplashReady = (event: IpcMainEvent, payload?: { windowId?: number }) => {
+    if (this.shouldHoldSplash()) return;
     this.revealCodeWindow(event, payload);
     this.close();
   };
 
+  private shouldHoldSplash(): boolean {
+    return this.holdSplash || this.holdOverride;
+  }
+
   private revealCodeWindow(event?: IpcMainEvent, payload?: { windowId?: number }) {
-    const targetFromPayload = payload?.windowId ? BrowserWindow.fromId(payload.windowId) : undefined;
+    const targetFromPayload = payload?.windowId
+      ? BrowserWindow.fromId(payload.windowId)
+      : undefined;
     const targetFromSender = event ? BrowserWindow.fromWebContents(event.sender) : undefined;
-    const target = targetFromPayload || targetFromSender || this.windowsManager.getFirstBrowserWindow();
+    const target =
+      targetFromPayload || targetFromSender || this.windowsManager.getFirstBrowserWindow();
     if (!target || target.isDestroyed()) return false;
     if (target.isMinimized()) {
       target.restore();

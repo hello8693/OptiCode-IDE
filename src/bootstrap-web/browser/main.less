@@ -17,7 +17,9 @@
   --kt-split-handle-size: 1px !important;
 }
 
-div, section, main {
+div,
+section,
+main {
   border-radius: 0 !important;
 }
 
@@ -41,12 +43,25 @@ div, section, main {
   .sumi-main-content {
     padding: 0 !important;
   }
-  .kt-panel, .sumi-panel {
+  .kt-panel,
+  .sumi-panel {
     margin: 0 !important;
   }
 }
 
-[class*="radius"], [class*="Radius"], [class*="rounded"] {
+// 去除编辑器 tab 条末端伪元素倒圆角
+:global {
+  .kt_editor_tabs_scroll_wrapper::before,
+  .kt_editor_tabs_scroll_wrapper::after,
+  .kt_editor_tabs_content::before,
+  .kt_editor_tabs_content::after {
+    border-radius: 0 !important;
+  }
+}
+
+[class*='radius'],
+[class*='Radius'],
+[class*='rounded'] {
   border-radius: 0 !important;
 }
 
@@ -68,8 +83,8 @@ div, section, main {
   .windowActions,
   button,
   a,
-  [role="button"],
-  [data-component="menubar-item"],
+  [role='button'],
+  [data-component='menubar-item'],
   input,
   select {
     -webkit-app-region: no-drag;

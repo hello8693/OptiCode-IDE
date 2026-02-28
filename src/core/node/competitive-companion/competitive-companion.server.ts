@@ -2,6 +2,7 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { exec } from 'node:child_process';
 import { Injectable, Autowired } from '@opensumi/di';
 import { ILogService } from '@/logger/common';
 import {
@@ -49,28 +50,110 @@ export class CompetitiveCompanionServer {
         return;
       }
     }
-    this.logger.error(`[CompetitiveCompanion] Failed to bind ports: ${ports.join(', ') || 'none'}.`);
+    this.logger.error(
+      `[CompetitiveCompanion] Failed to bind ports: ${ports.join(', ') || 'none'}.`,
+    );
   }
 
   async stop(): Promise<void> {
     if (!this.server) return;
-    await new Promise<void>((resolve) => this.server?.close(() => resolve()));
+    await new Promise<void>(resolve => this.server?.close(() => resolve()));
     this.server = undefined;
     this.port = undefined;
   }
 
   private async tryListen(port: number): Promise<boolean> {
-    return new Promise((resolve) => {
+    const first = await this.tryListenOnce(port);
+    if (first.ok) return true;
+
+    if (first.err?.code === 'EADDRINUSE') {
+      this.logger.warn(`[CompetitiveCompanion] Port ${port} is in use, attempting to reclaim...`);
+      const reclaimed = await this.tryForceTakePort(port);
+      if (reclaimed) {
+        const retry = await this.tryListenOnce(port);
+        return retry.ok;
+      }
+    }
+
+    return false;
+  }
+
+  private async tryListenOnce(port: number): Promise<{ ok: boolean; err?: NodeJS.ErrnoException }> {
+    return new Promise(resolve => {
       const server = http.createServer((req, res) => this.handleRequest(req, res));
       server.on('error', (err: NodeJS.ErrnoException) => {
         if (err.code !== 'EADDRINUSE') {
           this.logger.error(`[CompetitiveCompanion] Server error: ${err.message}`);
         }
-        resolve(false);
+        resolve({ ok: false, err });
       });
       server.listen(port, '127.0.0.1', () => {
         this.server = server;
-        resolve(true);
+        resolve({ ok: true });
+      });
+    });
+  }
+
+  private async tryForceTakePort(port: number): Promise<boolean> {
+    const pids = await this.findPidsListening(port);
+    if (!pids.length) return false;
+
+    let attempted = false;
+    for (const pid of pids) {
+      if (!Number.isFinite(pid) || pid <= 0 || pid === process.pid) continue;
+      attempted = true;
+      try {
+        process.kill(pid, 'SIGKILL');
+        this.logger.warn(`[CompetitiveCompanion] Killed process ${pid} occupying port ${port}.`);
+      } catch (err: any) {
+        this.logger.warn(
+          `[CompetitiveCompanion] Failed to kill process ${pid} on port ${port}: ${err?.message || err}`,
+        );
+      }
+    }
+
+    if (!attempted) return false;
+    await new Promise(resolve => setTimeout(resolve, 200));
+    return true;
+  }
+
+  private async findPidsListening(port: number): Promise<number[]> {
+    const platform = process.platform;
+    if (platform === 'win32') {
+      const output = await this.execCmd(`netstat -ano -p tcp | findstr :${port}`);
+      const pids = new Set<number>();
+      output
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(Boolean)
+        .forEach(line => {
+          const parts = line.split(/\s+/);
+          const pid = Number(parts[parts.length - 1]);
+          if (Number.isFinite(pid)) pids.add(pid);
+        });
+      return Array.from(pids);
+    }
+
+    const output = await this.execCmd(`lsof -n -P -iTCP:${port} -sTCP:LISTEN`);
+    const lines = output.split(/\r?\n/).filter(Boolean);
+    if (lines.length <= 1) return [];
+    const pids = new Set<number>();
+    for (const line of lines.slice(1)) {
+      const parts = line.trim().split(/\s+/);
+      const pid = Number(parts[1]);
+      if (Number.isFinite(pid)) pids.add(pid);
+    }
+    return Array.from(pids);
+  }
+
+  private async execCmd(command: string): Promise<string> {
+    return new Promise(resolve => {
+      exec(command, { windowsHide: true }, (err, stdout) => {
+        if (err) {
+          resolve('');
+          return;
+        }
+        resolve(stdout || '');
       });
     });
   }
@@ -133,11 +216,14 @@ export class CompetitiveCompanionServer {
     }
   }
 
-  private async readBody(req: http.IncomingMessage, res: http.ServerResponse): Promise<string | undefined> {
-    return new Promise((resolve) => {
+  private async readBody(
+    req: http.IncomingMessage,
+    res: http.ServerResponse,
+  ): Promise<string | undefined> {
+    return new Promise(resolve => {
       let size = 0;
       let body = '';
-      req.on('data', (chunk) => {
+      req.on('data', chunk => {
         size += chunk.length;
         if (size > MAX_BODY_SIZE) {
           res.writeHead(413, { 'Content-Type': 'application/json' });
@@ -179,9 +265,9 @@ export class CompetitiveCompanionServer {
     const normalizedPorts = Array.from(
       new Set(
         ports
-          .map((p) => Number(p))
-          .filter((p) => Number.isFinite(p) && p > 0 && p <= 65535)
-          .map((p) => Math.trunc(p)),
+          .map(p => Number(p))
+          .filter(p => Number.isFinite(p) && p > 0 && p <= 65535)
+          .map(p => Math.trunc(p)),
       ),
     );
     return {

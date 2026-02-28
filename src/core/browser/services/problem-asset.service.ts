@@ -2,11 +2,7 @@ import { Autowired, Injectable } from '@opensumi/di';
 import { URI } from '@opensumi/ide-core-browser';
 import { IFileServiceClient } from '@opensumi/ide-file-service';
 
-import {
-  FileItem,
-  IProblemAssetService,
-  ProblemAssets,
-} from '../../common/problem-assets';
+import { FileItem, IProblemAssetService, ProblemAssets } from '../../common/problem-assets';
 import { IProblem } from '../../common/problem';
 
 @Injectable()
@@ -15,7 +11,7 @@ export class ProblemAssetService implements IProblemAssetService {
   private readonly fileService: IFileServiceClient;
 
   private toUri(fsPath: string) {
-    return new URI(`file://${fsPath}`).toString();
+    return URI.file(fsPath).toString();
   }
 
   private async safeListDir(dirPath: string): Promise<FileItem[]> {
@@ -72,7 +68,9 @@ export class ProblemAssetService implements IProblemAssetService {
       'samples',
       'solutions',
     ]);
-    const others = rootChildren.filter(item => !reserved.has(item.name) && !item.name.startsWith('.'));
+    const others = rootChildren.filter(
+      item => !reserved.has(item.name) && !item.name.startsWith('.'),
+    );
     return {
       source: [{ name: `${problem.meta.id}.cpp`, path: problem.sourcePath, isDirectory: false }],
       samples,
@@ -83,7 +81,7 @@ export class ProblemAssetService implements IProblemAssetService {
 
   async listAssetsForProblems(problems: IProblem[]): Promise<Record<string, ProblemAssets>> {
     const entries = await Promise.all(
-      problems.map(async (problem) => [problem.meta.id, await this.listAssets(problem)] as const),
+      problems.map(async problem => [problem.meta.id, await this.listAssets(problem)] as const),
     );
     return Object.fromEntries(entries);
   }

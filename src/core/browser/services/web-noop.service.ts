@@ -21,4 +21,8 @@ export class WebAppWindowService implements IAppWindowService {
   openNewWindow(): void {
     // no-op for web
   }
+
+  openSplashDebug(): void {
+    // no-op for web
+  }
 }

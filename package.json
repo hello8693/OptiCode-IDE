@@ -5,6 +5,7 @@
   "main": "out/main",
   "scripts": {
     "start": "electron-forge start",
+    "start:splash": "cross-env OPTICODE_SPLASH_HOLD=1 electron-forge start",
     "start-web": "ts-node build/webpack-web/web-start.ts",
     "build:builtin-extensions": "node build/builtin-extensions.mjs",
     "prestart": "yarn build:builtin-extensions",

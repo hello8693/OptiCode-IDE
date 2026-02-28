@@ -26,17 +26,24 @@ export const localizationBundle = {
     'preference.ai.model.code.topP': 'Code Completion > top_p',
     'preference.ai.model.code.modelName.tooltip': 'The default is same as Chat Model Name',
     'preference.ai.model.code.fimTemplate': 'Code > FIM Template',
-    'preference.ai.model.code.fimTemplate.tooltip': 'If no template is provided, the pre-cursor and post-cursor code will be sent directly to the api, and if a template is provided, the following format should be configured\n<fim_prefix>{prefix}<fim_suffix>{suffix}<fim_middle>\n{prefix} will be replaced with the pre-cursor code, and {suffix} will be replaced with the post-cursor code',
-    'preference.ai.model.temperature.description': 'What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.\nWe generally recommend altering this or top_p but not both.',
-    'preference.ai.model.maxTokens.description': 'The maximum number of tokens that can be generated in the chat completion.',
-    'preference.ai.model.presencePenalty.description': 'Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model\'s likelihood to talk about new topics.',
-    'preference.ai.model.frequencyPenalty.description': 'Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model\'s likelihood to repeat the same line verbatim.',
-    'preference.ai.model.topP.description': 'An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.\nWe generally recommend altering this or temperature but not both.',
+    'preference.ai.model.code.fimTemplate.tooltip':
+      'If no template is provided, the pre-cursor and post-cursor code will be sent directly to the api, and if a template is provided, the following format should be configured\n<fim_prefix>{prefix}<fim_suffix>{suffix}<fim_middle>\n{prefix} will be replaced with the pre-cursor code, and {suffix} will be replaced with the post-cursor code',
+    'preference.ai.model.temperature.description':
+      'What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.\nWe generally recommend altering this or top_p but not both.',
+    'preference.ai.model.maxTokens.description':
+      'The maximum number of tokens that can be generated in the chat completion.',
+    'preference.ai.model.presencePenalty.description':
+      "Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics.",
+    'preference.ai.model.frequencyPenalty.description':
+      "Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim.",
+    'preference.ai.model.topP.description':
+      'An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered.\nWe generally recommend altering this or temperature but not both.',
 
     'ai.model.noConfig': 'Please configure the AI model service for a better experience',
     'ai.model.go': 'Go',
 
     'autoUpdater.checkForUpdates': 'Check for Updates...',
     'opticode-ide.openLogDir': 'Open Log Folder',
+    'opticode-ide.debugSplash': 'Debug Splash',
   },
 };

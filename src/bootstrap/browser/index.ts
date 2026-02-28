@@ -2,13 +2,22 @@ import '@opensumi/ide-i18n';
 import '@/i18n';
 import '@opensumi/ide-core-browser/lib/style/index.less';
 import '@opensumi/ide-core-browser/lib/style/icon.less';
-import './index.less'
+import './index.less';
 
 import { DEFAULT_LAYOUT_VIEW_SIZE } from '@opensumi/ide-core-browser/lib/layout/constants';
 import { RenderedEvent } from '@opensumi/ide-core-browser/lib/layout/layout.interface';
 import { IElectronMainLifeCycleService } from '@opensumi/ide-core-common/lib/electron';
 import { IEventBus } from '@opensumi/ide-core-common';
-import { IClientAppOpts, electronEnv, URI, ClientCommonModule, BrowserModule, ConstructorOf, LayoutConfig, SlotLocation } from '@opensumi/ide-core-browser';
+import {
+  IClientAppOpts,
+  electronEnv,
+  URI,
+  ClientCommonModule,
+  BrowserModule,
+  ConstructorOf,
+  LayoutConfig,
+  SlotLocation,
+} from '@opensumi/ide-core-browser';
 import { ToolbarActionBasedLayout } from '@opensumi/ide-core-browser/lib/components';
 import { ClientApp } from '@opensumi/ide-core-browser/lib/bootstrap/app';
 import { MainLayoutModule } from '@opensumi/ide-main-layout/lib/browser';
@@ -45,7 +54,7 @@ import { VariableModule } from '@opensumi/ide-variable/lib/browser';
 import { KeymapsModule } from '@opensumi/ide-keymaps/lib/browser';
 import { MonacoEnhanceModule } from '@opensumi/ide-monaco-enhance/lib/browser/module';
 import { TerminalNextModule } from '@opensumi/ide-terminal-next/lib/browser';
-import { terminalPreferenceSchema } from '@opensumi/ide-terminal-next/lib/common/preference'
+import { terminalPreferenceSchema } from '@opensumi/ide-terminal-next/lib/common/preference';
 import { CommentsModule } from '@opensumi/ide-comments/lib/browser';
 import { ClientAddonModule } from '@opensumi/ide-addons/lib/browser';
 import { TaskModule } from '@opensumi/ide-task/lib/browser';
@@ -53,8 +62,8 @@ import { OpenVsxExtensionManagerModule } from '@opensumi/ide-extension-manager/l
 import { DesignModule } from '@opensumi/ide-design/lib/browser';
 import { DESIGN_MENUBAR_CONTAINER_VIEW_ID } from '@opensumi/ide-design/lib/common/constants';
 import { CoreBrowserModule, ELECTRON_HEADER } from '@/core/browser';
-import { AutoUpdaterModule } from '@/auto-updater/browser'
-import { getStartupTiming } from '@/core/common/startup-timing'
+import { AutoUpdaterModule } from '@/auto-updater/browser';
+import { getStartupTiming } from '@/core/common/startup-timing';
 
 // 临时修复 bash 打开 -l 参数不支持导致报错的问题
 terminalPreferenceSchema.properties['terminal.integrated.shellArgs.osx'].default = [];
@@ -142,9 +151,8 @@ const layoutConfig: LayoutConfig = {
   },
   [SlotLocation.extra]: {
     modules: ['breadcrumb-menu'],
-  }
+  },
 };
-
 
 renderApp();
 
@@ -164,7 +172,9 @@ async function renderApp() {
     preferenceDirName: electronEnv.metadata.environment.dataFolderName,
     storageDirName: electronEnv.metadata.environment.dataFolderName,
     extensionStorageDirName: electronEnv.metadata.environment.dataFolderName,
-    extWorkerHost: electronEnv.metadata.workerHostEntry ? URI.file(electronEnv.metadata.workerHostEntry).toString() : undefined,
+    extWorkerHost: electronEnv.metadata.workerHostEntry
+      ? URI.file(electronEnv.metadata.workerHostEntry).toString()
+      : undefined,
     ignoreWorkerHostCors: true,
     defaultPreferences: {
       'settings.userBeforeWorkspace': true,
@@ -174,14 +184,16 @@ async function renderApp() {
     },
     onigWasmUri: URI.file(electronEnv.onigWasmPath).toString(true),
     treeSitterWasmDirectoryUri: URI.file(electronEnv.treeSitterWasmDirectoryPath).toString(true),
-  }
+  };
 
   const app = new ClientApp(opts);
   timing.mark('clientApp.created');
 
   const notifySplashReady = () => {
+    if (electronEnv?.env?.OPTICODE_SPLASH_HOLD === '1') return;
     if (!electronEnv.isElectronRenderer) return;
-    const ipc = (electronEnv as any).ipcRenderer || (window as any).require?.('electron')?.ipcRenderer;
+    const ipc =
+      (electronEnv as any).ipcRenderer || (window as any).require?.('electron')?.ipcRenderer;
     if (!ipc) return;
     ipc.send('opticode:splash-ready', { windowId: electronEnv.currentWindowId });
   };

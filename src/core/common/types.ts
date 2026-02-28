@@ -1,6 +1,6 @@
 import type { ThemeType } from '@opensumi/ide-theme';
 
-export { ThemeType }
+export { ThemeType };
 
 export interface ThemeData {
   menuBarBackground?: string;
@@ -15,11 +15,11 @@ export const IStorageService = 'IStorageService';
 export type IStorageData = object | string | number | boolean | undefined | null;
 export interface IStorageService {
   getItem<T>(key: string, defaultValue: T): T;
-	getItem<T>(key: string, defaultValue?: T): T | undefined;
+  getItem<T>(key: string, defaultValue?: T): T | undefined;
   setItem(key: string, data?: IStorageData): void;
-	setItems(items: readonly { key: string; data?: IStorageData }[]): void;
-	removeItem(key: string): void;
-	close(): Promise<void>;
+  setItems(items: readonly { key: string; data?: IStorageData }[]): void;
+  removeItem(key: string): void;
+  close(): Promise<void>;
 }
 
 export const IThemeService = 'IThemeService';
@@ -47,6 +47,7 @@ export const IAppWindowService = 'IAppWindowService';
 
 export interface IAppWindowService {
   openNewWindow(): void;
+  openSplashDebug(): void;
 }
 
 export const IProduct = Symbol('IProduct');
@@ -55,8 +56,8 @@ export interface IProduct {
   applicationName: string;
   autoUpdaterConfigUrl: string;
   dataFolderName: string;
-  commit: string,
-  date: string,
+  commit: string;
+  date: string;
 }
 
 export const IEnvironmentService = Symbol('IEnvironmentService');

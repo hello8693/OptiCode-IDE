@@ -25,7 +25,9 @@ quick-open-container {
 }
 
 // 去除主要视图可能的圆角
-div, section, main {
+div,
+section,
+main {
   border-radius: 0 !important;
 }
 
@@ -50,13 +52,16 @@ div, section, main {
   .sumi-main-content {
     padding: 0 !important;
   }
-  .kt-panel, .sumi-panel {
+  .kt-panel,
+  .sumi-panel {
     margin: 0 !important;
   }
 }
 
 // 针对 OptiCode IDE 设计规范中常见的圆角类名
-[class*="radius"], [class*="Radius"], [class*="rounded"] {
+[class*='radius'],
+[class*='Radius'],
+[class*='rounded'] {
   border-radius: 0 !important;
 }
 
@@ -95,6 +100,36 @@ div, section, main {
   }
 }
 
+// 去除编辑器 tab 条末端伪元素倒圆角
+:global {
+  .kt_editor_tabs_scroll_wrapper::before,
+  .kt_editor_tabs_scroll_wrapper::after,
+  .kt_editor_tabs_content::before,
+  .kt_editor_tabs_content::after {
+    border-radius: 0 !important;
+  }
+}
+
+// 去掉 editor tab 末端与相邻 tab 的倒圆角（design 样式）
+:global {
+  .design-kt_editor_group
+    .design-kt_editor_tabs_content.design-kt_editor_tabs_current_last
+    .design-kt_editor_tab_current::before {
+    border-radius: 0 !important;
+  }
+
+  .design-kt_editor_group
+    .design-kt_editor_tabs_content
+    .design-kt_editor_tab_current_prev
+    .design-editor_tab_block_container,
+  .design-kt_editor_group
+    .design-kt_editor_tabs_content
+    .design-kt_editor_tab_current_next
+    .design-editor_tab_block_container {
+    border-radius: 0 !important;
+  }
+}
+
 // 标题栏整体可拖拽修复
 :global(#top) {
   -webkit-app-region: drag;
@@ -115,8 +150,8 @@ div, section, main {
   .sumi-menubar-item,
   button,
   a,
-  [role="button"],
-  [data-component="menubar-item"],
+  [role='button'],
+  [data-component='menubar-item'],
   .windowActions,
   input,
   select {

@@ -26,17 +26,23 @@ export const localizationBundle = {
     'preference.ai.model.code.topP': '代码 > top_p',
     'preference.ai.model.code.modelName.tooltip': '默认和对话模型一致',
     'preference.ai.model.code.fimTemplate': 'FIM 模版',
-    'preference.ai.model.code.fimTemplate.tooltip': '如果未提供模版, 则将光标前后代码直接发送到接口, 如果提供了模版, 配置如下格式：“<fim_prefix>{prefix}<fim_suffix>{suffix}<fim_middle>”，{prefix} 会替换为光标前代码，{suffix} 会替换为光标后代码',
-    'preference.ai.model.temperature.description': '采样温度，介于 0 和 2 之间。较高的值（如 0.8）将使输出更加随机，而较低的值（如 0.2）将使其更加集中性和确定性。\n通常建议只改变 top_p 或 temperature，不要两个都改',
+    'preference.ai.model.code.fimTemplate.tooltip':
+      '如果未提供模版, 则将光标前后代码直接发送到接口, 如果提供了模版, 配置如下格式：“<fim_prefix>{prefix}<fim_suffix>{suffix}<fim_middle>”，{prefix} 会替换为光标前代码，{suffix} 会替换为光标后代码',
+    'preference.ai.model.temperature.description':
+      '采样温度，介于 0 和 2 之间。较高的值（如 0.8）将使输出更加随机，而较低的值（如 0.2）将使其更加集中性和确定性。\n通常建议只改变 top_p 或 temperature，不要两个都改',
     'preference.ai.model.maxTokens.description': '补全完成时可以生成的最大 token 数。',
-    'preference.ai.model.presencePenalty.description': '存在惩罚，介于 -2.0 和 2.0 之间的数字。正值会根据新生成的词汇是否出现在目前的文本中来进行惩罚，从而增加模型讨论新话题的可能性。',
-    'preference.ai.model.frequencyPenalty.description': '频率惩罚，介于 -2.0 和 2.0 之间的数字。正值根据新标记到目前为止在文本中的现有频率对其进行惩罚，从而降低了模型逐字重复同一行的可能性。',
-    'preference.ai.model.topP.description': '温度采样的一种替代方法，称为原子核抽样，模型只会考虑前 top_p 概率质量的标记结果。因此，0.1 表示仅考虑前 10% 概率质量的标记。\n通常建议只改变 top_p 或 temperature，不要两个都改',
+    'preference.ai.model.presencePenalty.description':
+      '存在惩罚，介于 -2.0 和 2.0 之间的数字。正值会根据新生成的词汇是否出现在目前的文本中来进行惩罚，从而增加模型讨论新话题的可能性。',
+    'preference.ai.model.frequencyPenalty.description':
+      '频率惩罚，介于 -2.0 和 2.0 之间的数字。正值根据新标记到目前为止在文本中的现有频率对其进行惩罚，从而降低了模型逐字重复同一行的可能性。',
+    'preference.ai.model.topP.description':
+      '温度采样的一种替代方法，称为原子核抽样，模型只会考虑前 top_p 概率质量的标记结果。因此，0.1 表示仅考虑前 10% 概率质量的标记。\n通常建议只改变 top_p 或 temperature，不要两个都改',
 
     'ai.model.noConfig': '为了更好的体验，请先配置 AI 模型服务',
     'ai.model.go': '前往',
 
     'autoUpdater.checkForUpdates': '检查更新',
     'opticode-ide.openLogDir': '打开日志文件夹',
+    'opticode-ide.debugSplash': '调试 Splash',
   },
 };
