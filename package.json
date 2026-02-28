@@ -161,7 +161,8 @@
   "resolutions": {
     "@rjsf/validator-ajv6": "5.4.0",
     "node-pty": "1.2.0-beta.11",
-    "nan": "2.25.0"
+    "nan": "2.25.0",
+    "nsfw@npm:2.2.0": "patch:nsfw@npm%3A2.2.0#~/.yarn/patches/nsfw-npm-2.2.0-a584b090a0.patch"
   },
   "dependenciesMeta": {
     "@parcel/watcher": {
